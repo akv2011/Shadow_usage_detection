@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class DatabaseManager:
     """Manages SQLite database operations for analysis history."""
     
-    def __init__(self, db_path: str = "history.db"):
+    def __init__(self, db_path: str = "data/history.db"):
         """
         Initialize the database manager.
         
