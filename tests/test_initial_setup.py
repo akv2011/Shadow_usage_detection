@@ -1,26 +1,21 @@
-"""
-Initial setup tests for Shadow AI Detection Tool.
 
-These tests verify that the project structure and basic configuration
-are working correctly.
-"""
 
 import sys
 from pathlib import Path
 
 
 def test_project_initialization():
-    """Test that the project initializes correctly."""
+
     assert True, "Basic assertion test passed"
 
 
 def test_python_version():
-    """Test that we're using a supported Python version."""
+
     assert sys.version_info >= (3, 9), f"Python 3.9+ required, got {sys.version}"
 
 
 def test_project_structure():
-    """Test that the required project directories exist."""
+
     project_root = Path(__file__).parent.parent
 
     # Check main directories exist
@@ -37,7 +32,7 @@ def test_project_structure():
 
 
 def test_shadow_ai_import():
-    """Test that the shadow_ai package can be imported."""
+
     import shadow_ai
 
     # Check package metadata exists
@@ -50,7 +45,7 @@ def test_shadow_ai_import():
 
 
 def test_configuration_files_exist():
-    """Test that configuration files are present and accessible."""
+
     project_root = Path(__file__).parent.parent
 
     config_files = [
@@ -67,7 +62,7 @@ def test_configuration_files_exist():
 
 
 def test_project_dependencies():
-    """Test that core dependencies are available."""
+
     import importlib.util
 
     dependencies = ["fastapi", "uvicorn", "click", "pytest", "httpx"]
@@ -77,13 +72,11 @@ def test_project_dependencies():
         if spec is None:
             raise AssertionError(f"Missing required dependency: {dep}")
 def test_development_tools():
-    """Test that development tools are accessible."""
+
     import subprocess
 
-    # Test in shadow-ai conda environment
     conda_env = "shadow-ai"
 
-    # Test ruff
     result = subprocess.run(
         ["conda", "run", "-n", conda_env, "ruff", "--version"],
         capture_output=True,
@@ -92,7 +85,6 @@ def test_development_tools():
     assert result.returncode == 0, f"ruff not accessible: {result.stderr}"
     assert "ruff" in result.stdout.lower(), "ruff version output unexpected"
 
-    # Test mypy
     result = subprocess.run(
         ["conda", "run", "-n", conda_env, "mypy", "--version"],
         capture_output=True,
@@ -101,7 +93,6 @@ def test_development_tools():
     assert result.returncode == 0, f"mypy not accessible: {result.stderr}"
     assert "mypy" in result.stdout.lower(), "mypy version output unexpected"
 
-    # Test pytest
     result = subprocess.run(
         ["conda", "run", "-n", conda_env, "pytest", "--version"],
         capture_output=True,

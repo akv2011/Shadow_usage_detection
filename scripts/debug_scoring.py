@@ -1,6 +1,5 @@
 from shadow_ai.scoring import ConfidenceScorer
 
-# Test the actual scores for our test cases
 print("=== High AI patterns test ===")
 high_ai_results = {
     'comment_patterns': {'generic_comments': 15, 'comment_to_code_ratio': 0.9, 'repetitive_patterns': 8},

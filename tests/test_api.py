@@ -1,13 +1,4 @@
-#!/usr/bin/env python3
-"""
-Tests for the Shadow AI Detection API
 
-This module contains comprehensive tests for the FastAPI backend,
-testing all endpoints with various input scenarios and edge cases.
-
-Author: Shadow AI Detection Tool
-Created: 2025-08-04
-"""
 
 import pytest
 import io

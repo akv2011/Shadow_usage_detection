@@ -1,12 +1,4 @@
-"""
-Core heuristic detection engine for AI-generated code analysis.
-
-This module contains the main logic for analyzing code snippets and detecting
-patterns that may indicate AI generation. It includes various heuristic checks
-such as comment pattern analysis, variable naming analysis, code structure
-analysis, and AI language pattern matching.
-"""
-
+# Shadow AI Detection Engine - Core heuristic analysis
 import re
 import ast
 from typing import Dict, List, Any, Union
@@ -14,25 +6,7 @@ from .scoring import ConfidenceScorer
 
 
 def analyze_comment_patterns(code_string: str) -> Dict[str, Any]:
-    """
-    Analyze comments in a code snippet for patterns indicative of AI generation.
-    
-    This function looks for:
-    - Generic, templated comment structures
-    - High comment-to-code ratios
-    - Overly simplistic or repetitive comments
-    - Comments that follow predictable patterns
-    
-    Args:
-        code_string (str): The source code to analyze
-        
-    Returns:
-        Dict[str, Any]: Dictionary containing analysis results:
-            - 'generic_comments': Count of generic comment patterns
-            - 'comment_to_code_ratio': Ratio of comment lines to code lines
-            - 'repetitive_patterns': Count of repetitive comment structures
-            - 'total_comments': Total number of comments found
-    """
+    # Analyze comments for AI generation patterns
     if not code_string or not isinstance(code_string, str):
         return {
             'generic_comments': 0,
@@ -1124,24 +1098,7 @@ def _calculate_style_inconsistency_score(inconsistencies: List[str], total_block
 
 
 def analyze(code_string: str) -> Dict[str, Any]:
-    """
-    Main orchestrator function that runs all heuristic checks on code.
-    
-    This function coordinates the execution of all individual heuristic analysis
-    functions and aggregates their results into a comprehensive analysis report.
-    
-    Args:
-        code_string (str): The source code to analyze
-        
-    Returns:
-        Dict[str, Any]: Comprehensive analysis results containing:
-            - 'comment_patterns': Results from comment pattern analysis
-            - 'variable_names': Results from variable naming analysis  
-            - 'code_structure': Results from code structure analysis
-            - 'ai_language_patterns': Results from AI language pattern matching
-            - 'summary': High-level summary statistics
-            - 'analysis_metadata': Metadata about the analysis
-    """
+    # Main analysis function - runs all heuristic checks
     if not code_string or not isinstance(code_string, str):
         # Return empty results for invalid input
         empty_result = {

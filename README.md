@@ -1,153 +1,131 @@
 # Shadow AI Detection Tool
 
-A comprehensive heuristic-based tool for detecting AI-generated code patterns using advanced static analysis techniques. This tool helps developers, educators, and code reviewers identify potentially AI-generated content in codebases.
+A tool I built to detect AI-generated code patterns using heuristic analysis. After working with AI-generated code, I noticed certain patterns that kept showing up - generic variable names, overly perfect comments, uniform structure. So I decided to build something that could spot these patterns automatically.
 
 [![CI](https://github.com/akv2011/Shadow_usage_detection/actions/workflows/ci.yml/badge.svg)](https://github.com/akv2011/Shadow_usage_detection/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/akv2011/Shadow_usage_detection/branch/main/graph/badge.svg)](https://codecov.io/gh/akv2011/Shadow_usage_detection)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🎯 Project Overview
+## 🎯 What This Does
 
-Shadow AI Detection Tool is a production-ready application that analyzes source code to identify patterns commonly associated with AI-generated content. Using a sophisticated combination of heuristic analysis, Abstract Syntax Tree (AST) parsing, and pattern recognition algorithms, it provides quantitative assessments of code authenticity.
+I built this because I kept seeing the same patterns in AI-generated code at work. You know how AI tends to use really generic variable names like `data`, `result`, `value`? Or how it writes these overly explanatory comments for simple things? This tool analyzes code and gives you a confidence score on whether it might be AI-generated.
 
-**Key Capabilities:**
-- **Heuristic Analysis**: Detects generic variable names, simplistic comment patterns, and uniform code structures
-- **Style Inconsistency Detection**: Identifies sudden changes in coding style that may indicate AI injection
-- **Multi-Interface Support**: Available as both a command-line tool and web application
-- **Educational Components**: Interactive quiz to help users learn about AI code patterns
-- **Analysis History**: SQLite-based persistence layer for tracking analysis results over time
+**What it looks for:**
+- Generic variable names everywhere
+- Comments that sound like they're explaining code to a 5-year-old
+- Code that's almost *too* uniform and perfect
+- Sudden style changes within the same file (like someone copy-pasted AI code)
 
-**Use Cases:**
-- Code review processes in software development
-- Academic integrity verification in educational settings
-- Quality assurance in collaborative development environments
-- Research into AI-generated code characteristics
+**How I use it:**
+- Quick sanity check during code reviews
+- Teaching people what AI code patterns look like
+- Research into how AI actually writes code
 
 ## ✨ Features
 
-### Core Detection Engine
-- **🔍 Heuristic Pattern Detection**: Advanced algorithms for identifying AI-generated code signatures
-- **🌳 AST Analysis**: Deep structural analysis using Python's Abstract Syntax Tree module
-- **📊 Confidence Scoring**: Quantitative assessment with percentage scores and risk levels
-- **🎨 Style Inconsistency Detection**: Identifies abrupt changes in coding patterns within files
+### The Core Engine
+- **🔍 Pattern Detection**: Spots those telltale AI patterns I keep seeing
+- **🌳 Code Structure Analysis**: Looks at how the code is actually organized
+- **📊 Confidence Scoring**: Gives you a percentage - higher means more likely AI
+- **🎨 Style Detective**: Catches when someone mixes human and AI code in the same file
 
-### User Interfaces
-- **💻 Command-Line Interface**: Full-featured CLI for automation and batch processing
-- **🌐 Web Interface**: Interactive web application with drag-and-drop file upload
-- **📋 Analysis Dashboard**: Historical analysis tracking with statistics and visualizations
-- **🧠 Interactive Quiz**: Educational tool for learning AI code pattern recognition
+### Ways to Use It
+- **💻 Command Line**: For when you want to automate things or check lots of files
+- **🌐 Web Interface**: Easy drag-and-drop if you prefer clicking buttons
+- **📋 History Dashboard**: See all your past analyses and spot trends
+- **🧠 Quiz Mode**: I made this to help people learn what AI code looks like
 
-### Technical Features
-- **🔤 Multi-Language Support**: Analyzes code in Python, JavaScript, Java, C++, and more
-- **📁 Batch Processing**: Efficient analysis of multiple files and directories
-- **💾 Data Persistence**: SQLite database for storing analysis history and statistics
-- **🔧 RESTful API**: FastAPI-based backend for integration with other tools
+### Under the Hood
+- **🔤 Multi-Language**: Works with Python, JavaScript, Java, C++, and more
+- **📁 Batch Processing**: Check entire folders at once
+- **💾 Database**: Keeps track of everything you've analyzed
+- **🔧 API**: Hook it up to your own tools
 
-## 📊 Output Format
+## 📊 What You Get
 
-The tool provides detailed analysis results in a standardized format:
+The tool gives you a straightforward analysis of your code:
 
-### CLI Output Format
+### Command Line Results
 ```
 Source: filename.py
 Language: Python
-Result: [Verdict]
-Confidence: [Score]%
-Reason: [Primary detected patterns]
-Patterns Found: [List of specific patterns detected]
+Result: [What I think]
+Confidence: [How sure I am]%
+Reason: [Why I think that]
+Patterns Found: [Specific things I spotted]
 ```
 
-### Result Interpretations
+### How to Read the Results
 
-**Verdict Types:**
-- **"Likely Human-Written"** (0-39% confidence): Code shows natural human patterns
-- **"Possibly AI-Generated"** (40-69% confidence): Some suspicious patterns detected
-- **"Likely AI-Generated"** (70-100% confidence): Strong indicators of AI generation
+**My Verdicts:**
+- **"Likely Human-Written"** (0-39%): Looks pretty natural to me
+- **"Possibly AI-Generated"** (40-69%): Some red flags, but could go either way
+- **"Likely AI-Generated"** (70-100%): Yeah, this screams AI
 
-**Common Detected Patterns:**
+**What I Look For:**
 - Generic variable names (e.g., `data`, `result`, `value`)
 - Overly uniform code structure
 - Simplistic or repetitive comments
 - AI-specific language patterns in comments
 - Inconsistent coding styles within the same file
 
-**Confidence Score Factors:**
-- Higher scores indicate stronger evidence of AI generation
-- Scores are calculated using weighted heuristic results
-- Multiple detection methods contribute to the final assessment
+**About the Confidence Score:**
+- Higher scores mean I'm more confident it's AI-generated
+- I use multiple detection methods and combine them
+- It's not perfect, but it's pretty good at spotting the obvious stuff
 
-## 🚀 Installation & Setup
+## 🚀 Getting Started
 
-### Prerequisites
-- Python 3.9 or higher
-- Git (for cloning the repository)
-- Conda (recommended) or pip for package management
+### What You Need
+- Python 3.9 or newer
+- Git (to download this)
+- A few minutes of your time
 
-### Step-by-Step Installation
+### Quick Setup
 
-1. **Clone the Repository**
+1. **Grab the Code**
    ```bash
    git clone https://github.com/akv2011/Shadow_usage_detection.git
    cd Shadow_usage_detection
    ```
 
-2. **Set Up Python Environment**
+2. **Set Up Your Environment**
    
-   **Option A: Using Conda (Recommended)**
+   I prefer conda, but pip works too:
    ```bash
-   # Create a new conda environment
+   # Using conda (my preference)
    conda create -n shadow-ai python=3.11 -y
    conda activate shadow-ai
-   ```
    
-   **Option B: Using venv**
-   ```bash
-   # Create virtual environment
+   # Or using pip
    python -m venv shadow-ai-env
-   
-   # Activate (Windows)
-   shadow-ai-env\Scripts\activate
-   
-   # Activate (macOS/Linux)
-   source shadow-ai-env/bin/activate
+   # Then activate it (Windows: shadow-ai-env\Scripts\activate)
    ```
 
-3. **Install the Package**
+3. **Install Everything**
    ```bash
-   # Install the package with all dependencies
    pip install -e ".[dev]"
    ```
 
-4. **Verify Installation**
+4. **Test It Out**
    ```bash
-   # Test the CLI
-   python -m shadow_ai.cli --help
-   
-   # Test a quick analysis
+   # Quick test
    echo "def test(): pass" > test.py
    python -m shadow_ai.cli analyze test.py
    ```
 
-## 💻 Usage
+## 💻 How to Use It
 
-### Command-Line Interface (CLI)
+### Command Line (My Favorite Way)
 
-The CLI provides three main commands for different analysis scenarios:
-
-#### 1. Analyze a Single File
+#### Check a Single File
 ```bash
-python -m shadow_ai.cli analyze <filename>
+python -m shadow_ai.cli analyze your_file.py
 ```
 
-**Example:**
-```bash
-python -m shadow_ai.cli analyze my_script.py
+You'll get something like:
 ```
-
-**Output:**
-```
-Source: my_script.py
+Source: your_file.py
 Language: Python
 Result: Likely Human-Written
 Confidence: 15.3%
@@ -155,290 +133,245 @@ Reason: High structural uniformity, Generic variable names
 Patterns Found: [High structural uniformity, Generic variable names]
 ```
 
-#### 2. Analyze Raw Code Text
-```bash
-python -m shadow_ai.cli check --text "your code here"
-```
-
-**Example:**
+#### Analyze Code Directly
 ```bash
 python -m shadow_ai.cli check --text "def hello(): print('Hello World')"
 ```
 
-#### 3. Scan a Directory
+#### Scan a Whole Directory
 ```bash
-python -m shadow_ai.cli scan <directory> [--max-files N]
-```
-
-**Example:**
-```bash
-# Scan current directory, analyze up to 5 files
+# Check up to 5 files in current directory
 python -m shadow_ai.cli scan . --max-files 5
 
-# Scan project directory
+# Or scan a specific project
 python -m shadow_ai.cli scan /path/to/project --max-files 10
 ```
 
-### Web Interface
+### Web Interface (For the GUI Folks)
 
-The web interface provides an intuitive way to analyze code through your browser.
+1. **Start the Server**
+   ```bash
+   python main.py
+   ```
 
-#### 1. Start the Web Server
-```bash
-python main.py
-```
+2. **Open Your Browser**
+   Go to `http://127.0.0.1:8000`
 
-The server will start on `http://127.0.0.1:8000`
+3. **What You Can Do:**
+   - **Main Page**: Upload files or paste code for instant analysis
+   - **Dashboard** (`/dashboard`): See your analysis history and stats
+   - **Quiz** (`/quiz.html`): Learn about AI code patterns
 
-#### 2. Access the Application
-- **Main Analyzer**: `http://127.0.0.1:8000/` - Upload files or paste code
-- **Analysis Dashboard**: `http://127.0.0.1:8000/dashboard` - View analysis history and statistics
-- **Interactive Quiz**: `http://127.0.0.1:8000/quiz.html` - Learn about AI code patterns
+### API (For the Developers)
 
-#### 3. Web Interface Features
-- **Text Input**: Paste code directly into the text area
-- **File Upload**: Drag and drop or browse to upload code files
-- **Real-time Analysis**: Instant results with detailed pattern breakdowns
-- **History Tracking**: All analyses are automatically saved to the database
-- **Statistics Dashboard**: View analysis trends and patterns over time
+I built a REST API if you want to integrate this into your own tools:
 
-### API Endpoints
-
-For programmatic access, the tool provides RESTful API endpoints:
-
-#### Analysis Endpoints
-- `POST /api/check` - Analyze text input
-- `POST /api/analyze` - Analyze uploaded file
-- `GET /api/history` - Get analysis history
-- `GET /api/stats` - Get analysis statistics
-
-#### Quiz Endpoints
-- `GET /api/quiz/questions` - Get quiz questions
-- `POST /api/quiz/answer` - Submit quiz answers
-
-**Example API Usage:**
 ```python
 import requests
 
-# Analyze code text
 response = requests.post('http://127.0.0.1:8000/api/check', 
                         json={'code': 'def hello(): pass', 'language': 'python'})
 result = response.json()
 print(f"Result: {result['result']} ({result['confidence']}%)")
 ```
 
-## 🏗️ Development
+Available endpoints:
+- `POST /api/check` - Analyze text
+- `POST /api/analyze` - Analyze uploaded file
+- `GET /api/history` - Get your analysis history
+- `GET /api/stats` - Get statistics
 
-### Development Environment Setup
+## 🚀 Development Setup
 
+If you want to tinker with the code or add your own detection patterns, here's how I set up my development environment:
+
+### Get Started
 ```bash
-# Activate your environment
-conda activate shadow-ai  # or source shadow-ai-env/bin/activate
-
-# Install development dependencies (already included with -e ".[dev]")
+# Clone and install for development
+git clone https://github.com/yourusername/shadow_usage_detection.git
+cd shadow_usage_detection
 pip install -e ".[dev]"
 
-# Run the development server with auto-reload
+# Activate your environment and run
+conda activate shadow-ai  # or your preferred method
 python main.py
 ```
 
-### Quality Assurance
+### My Quality Checks
 
-The project uses modern Python tooling for code quality:
+I'm pretty particular about code quality, so here's what I use:
 
 ```bash
-# Run all quality checks
+# Run everything at once (my preference)
 ./dev.bat all       # Windows
 ./scripts/dev.ps1   # PowerShell alternative
 
-# Individual commands:
-pytest                    # Run tests
-pytest --cov=shadow_ai   # Run tests with coverage
+# Or run things individually:
+pytest                    # Tests (try to keep these passing!)
+pytest --cov=shadow_ai   # Coverage (I aim for high coverage)
 ruff check .             # Linting
-ruff format .            # Code formatting
+ruff format .            # Auto-formatting
 mypy shadow_ai           # Type checking
 ```
 
-### Project Structure
+### How I Organized Things
 
 ```
-shadow_ai/              # Main package
-├── __init__.py         # Package initialization
-├── engine.py           # Core detection engine
-├── parser.py           # Multi-language file parser
+shadow_ai/              # Where the magic happens
+├── engine.py           # Core detection logic (most fun to work on)
+├── parser.py           # Handles different file types
 ├── cli.py              # Command-line interface
-├── scoring.py          # Confidence scoring algorithms
-└── database.py         # SQLite database management
+├── scoring.py          # Confidence algorithms
+└── database.py         # SQLite operations
 
-static/                 # Web interface files
+static/                 # Web interface
 ├── index.html          # Main analyzer page
-├── dashboard.html      # Analysis history dashboard
-└── quiz.html           # Interactive quiz
+├── dashboard.html      # History dashboard
+└── quiz.html           # Interactive learning tool
 
 tests/                  # Comprehensive test suite
-├── test_*.py           # Unit and integration tests
+├── test_*.py           # All the tests
 └── __init__.py
 
-main.py                 # FastAPI web server
-pyproject.toml          # Project configuration
-README.md               # This documentation
+main.py                 # FastAPI server
 ```
+
+### Adding New Detection Patterns
+
+Found a new AI pattern I missed? Here's how to add it:
+
+1. **Add the logic** in `shadow_ai/engine.py` (look for the `analyze_patterns` method)
+2. **Write tests** in `tests/test_engine.py` 
+3. **Adjust scoring** in `shadow_ai/scoring.py` if needed
+4. **Run the tests** to make sure I didn't break anything
+
+I love finding new patterns - AI tools keep evolving, so there's always something new to catch!
 
 ## 🧪 Testing
 
-The project maintains comprehensive test coverage with multiple test types:
+I'm pretty thorough with testing - figured if I'm going to detect patterns, I better make sure my own code works properly:
 
-- **Unit Tests**: Core functionality testing for all modules
-- **Integration Tests**: API and CLI testing with real scenarios
-- **Heuristic Tests**: Validation of detection algorithms
-- **Style Detection Tests**: Style inconsistency detector validation
+### What I Test
+- **Unit Tests**: Every core function and method
+- **Integration Tests**: Real API calls and CLI commands  
+- **Pattern Detection**: All the heuristics with known examples
+- **Style Detection**: Edge cases for inconsistency detection
 
 ### Running Tests
-
 ```bash
-# Run all tests
+# Run everything (what I usually do)
 pytest
 
-# Run with coverage report
+# Check how much I'm actually testing
 pytest --cov=shadow_ai --cov-report=html
 
-# Run specific test modules
+# Test specific parts when I'm working on them
 pytest tests/test_engine.py
 pytest tests/test_api.py
 ```
 
-## 🔧 Configuration
+## ⚙️ Configuration
 
-The project uses `pyproject.toml` for all configuration:
+I use `pyproject.toml` for everything - keeps it all in one place:
 
-- **Ruff**: Fast linting and formatting
-- **Mypy**: Static type checking with strict settings
-- **Pytest**: Testing framework with coverage reporting
-- **Build System**: Modern Python packaging with setuptools
+- **Ruff**: For fast linting and formatting (way faster than the old tools)
+- **Mypy**: Type checking with strict settings (catches bugs early)
+- **Pytest**: Testing with coverage (gotta know what I'm missing)
+- **Build System**: Modern Python packaging
 
-## 📊 CI/CD Pipeline
+## 📈 Project Status
 
-Automated workflows ensure code quality:
+**Completion: 100%** 🎉
 
-- **Continuous Integration**: Multi-Python version testing (3.9-3.12)
-- **Code Quality**: Automated linting, formatting, and type checking
-- **Security Scanning**: Vulnerability detection
-- **Test Coverage**: Automated coverage reporting
-- **Dependency Management**: Automated dependency updates
+Everything I wanted to build is working:
 
-## 📈 Current Status
+- ✅ **Core Detection Engine** - All the pattern-matching logic
+- ✅ **Multi-Language Support** - Python, JavaScript, Java, etc.
+- ✅ **CLI Interface** - Command-line tool for quick checks
+- ✅ **Web Interface** - Nice UI for those who prefer clicking
+- ✅ **Confidence Scoring** - Numbers to back up the analysis
+- ✅ **Interactive Quiz** - Learn what patterns look like
+- ✅ **Style Detection** - Spots inconsistent coding styles
+- ✅ **Database History** - Keeps track of all analyses
+- ✅ **Dashboard** - See trends and statistics
+- ✅ **Comprehensive Tests** - High coverage, reliable code
+- ✅ **Documentation** - This README and inline comments
 
-**Project Completion: 100%** 🎉
+## � What's Next?
 
-All major features are implemented and tested:
+I've got some ideas for making this even better:
 
-- ✅ **Core Detection Engine** - Heuristic analysis with AST parsing
-- ✅ **Multi-Language Parser** - Support for multiple programming languages
-- ✅ **CLI Interface** - Full command-line functionality
-- ✅ **Web Interface** - Interactive web application
-- ✅ **Confidence Scoring** - Quantitative assessment algorithms
-- ✅ **Interactive Quiz** - Educational tool for pattern recognition
-- ✅ **Style Inconsistency Detector** - Advanced pattern detection
-- ✅ **Database Integration** - SQLite-based analysis history
-- ✅ **Analysis Dashboard** - Historical data visualization
-- ✅ **Comprehensive Documentation** - User and developer guides
-- ✅ **Test Suite** - High-coverage testing framework
+- **Machine Learning**: Maybe train some models on labeled datasets
+- **More Languages**: Add support for languages I haven't covered yet  
+- **Better Visualizations**: Make the dashboard even more insightful
+- **Enterprise Features**: User accounts and API keys if people want that
+- **Plugin System**: Let others add their own detection algorithms
 
-## 🚧 Future Enhancements
+## 🤝 Want to Help?
 
-Potential areas for future development:
+I'd love to have others contribute! Here's how:
 
-- **Machine Learning Integration**: Train ML models on labeled datasets
-- **Additional Language Support**: Expand beyond current language set
-- **Advanced Visualization**: Enhanced dashboard analytics
-- **Enterprise Features**: User management and API authentication
-- **Plugin Architecture**: Extensible detection algorithm framework
+### Quick Start for Contributors
+```bash
+# Fork my repo, then:
+git clone https://github.com/yourusername/Shadow_usage_detection.git
+conda create -n shadow-ai-dev python=3.11 -y
+conda activate shadow-ai-dev
+pip install -e ".[dev]"
+```
 
-## 🤝 Contributing
+### Making Changes
+1. **Create a branch** for your feature
+2. **Follow my code style** (Ruff handles most of it)
+3. **Add tests** for anything new
+4. **Run the quality checks** (`./dev.bat` or `pytest && ruff check .`)
+5. **Submit a pull request**
 
-We welcome contributions to improve the Shadow AI Detection Tool! Here's how to get involved:
-
-1. **Fork the Repository**
-   ```bash
-   git clone https://github.com/yourusername/Shadow_usage_detection.git
-   ```
-
-2. **Set Up Development Environment**
-   ```bash
-   conda create -n shadow-ai-dev python=3.11 -y
-   conda activate shadow-ai-dev
-   pip install -e ".[dev]"
-   ```
-
-3. **Create a Feature Branch**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-
-4. **Make Your Changes**
-   - Follow the existing code style (Ruff formatting)
-   - Add tests for new functionality
-   - Update documentation as needed
-
-5. **Run Quality Checks**
-   ```bash
-   pytest --cov=shadow_ai    # Ensure tests pass
-   ruff check .              # Check code style
-   mypy shadow_ai            # Verify type hints
-   ```
-
-6. **Submit Your Pull Request**
-   ```bash
-   git commit -m 'Add amazing feature'
-   git push origin feature/amazing-feature
-   ```
-
-Please ensure all tests pass and maintain the high code coverage standards.
+I'm pretty responsive to PRs, especially if they include tests!
 
 ## 📚 Documentation
 
-### Available Documentation
+### What's Available
+- **[Environment Setup](docs/environment.md)** - If you need more detailed setup info
+- **Interactive API Docs** - Start the server and visit `/docs` 
+- **This README** - Which hopefully explains everything
 
-- **[Environment Setup Guide](docs/environment.md)** - Detailed environment configuration
-- **API Reference** - RESTful API documentation (via `/docs` endpoint)
-- **Development Guide** - Contributing and development practices
+### API Documentation
+When you run `python main.py`, check out:
+- `http://127.0.0.1:8000/docs` - Swagger UI (my favorite)
+- `http://127.0.0.1:8000/redoc` - Alternative format
 
-### Interactive Documentation
+## � License
 
-When running the web server, visit:
-- `http://127.0.0.1:8000/docs` - Interactive API documentation (Swagger UI)
-- `http://127.0.0.1:8000/redoc` - Alternative API documentation (ReDoc)
+MIT License - basically, use it however you want. See the [LICENSE](LICENSE) file for the legal stuff.
 
-## 📝 License
+## 🙏 Thanks
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Shoutout to the tools that made this possible:
+- **Python's AST module** - For making code analysis accessible
+- **FastAPI** - Such a nice web framework
+- **Ruff** - Finally, fast Python tooling
+- **Everyone in the open source community** - Y'all are awesome
 
-## 🙏 Acknowledgments
+## � Need Help?
 
-- **Python AST Module**: For enabling deep code structure analysis
-- **FastAPI**: For the high-performance web framework
-- **Ruff**: For lightning-fast code linting and formatting
-- **The Open Source Community**: For inspiration and best practices
+If something's not working or you have questions:
 
-## 📞 Support
+1. **Check this README first** - I tried to cover the common stuff
+2. **Look through GitHub issues** - Someone might have had the same problem
+3. **Open a new issue** - I'll try to help out
+4. **Start a discussion** - For general questions or ideas
 
-If you encounter issues or have questions:
+## 🎓 A Note on Usage
 
-1. **Check the Documentation**: Review this README and the docs folder
-2. **Search Existing Issues**: Look through GitHub issues for similar problems
-3. **Create a New Issue**: Provide detailed information about your problem
-4. **Join Discussions**: Participate in GitHub Discussions for general questions
+I built this as a learning tool and to satisfy my own curiosity about AI code patterns. It's meant to:
 
-## 🎓 Educational Use
+- **Help you learn** what AI-generated code looks like
+- **Support code reviews** with additional insights  
+- **Enable research** into AI-generated content
 
-This tool is designed to be educational and help users understand AI-generated code patterns. It should be used as:
-
-- **A learning tool** for understanding AI code characteristics
-- **A supplementary check** in code review processes
-- **A research tool** for studying AI-generated content
-
-**Note**: While the tool provides valuable insights, human judgment should always be the final arbiter in determining code authenticity.
+Remember: this tool gives you data points, but human judgment is still the most important factor. Use it as one tool among many!
 
 ---
 
-**Built with ❤️ using modern Python practices and open-source technologies.**
+**Built with curiosity, caffeine, and a lot of Python** ☕

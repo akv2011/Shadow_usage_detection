@@ -1,21 +1,10 @@
-"""
-Multi-Language File Parser Module
-
-This module provides functionality to parse various input sources (files, strings, directories)
-and prepare them for analysis by the AI detection engine. It handles encoding detection,
-file validation, and provides a unified interface for different input types.
-
-Author: Shadow AI Detection Tool
-Created: 2025-08-04
-"""
-
+# Multi-language file parser for Shadow AI Detection
 import os
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 
 class ParserError(Exception):
-    """Base exception for parser-related errors."""
     pass
 
 

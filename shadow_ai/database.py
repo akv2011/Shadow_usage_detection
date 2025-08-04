@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
-"""
-Database module for Shadow AI Detection Tool
-
-This module provides database functionality for storing analysis history
-using SQLite. It handles database initialization, connection management,
-and CRUD operations for analysis records.
-
-Author: Shadow AI Detection Tool
-Created: 2025-08-04
-"""
+# SQLite database manager for analysis history
 
 import sqlite3
 import logging
@@ -23,32 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 class DatabaseManager:
-    """Manages SQLite database operations for analysis history."""
+    # SQLite database operations for analysis history
     
     def __init__(self, db_path: str = "data/history.db"):
-        """
-        Initialize the database manager.
-        
-        Args:
-            db_path: Path to the SQLite database file
-        """
         self.db_path = db_path
         self.init_database()
     
     def init_database(self) -> None:
-        """
-        Initialize the database and create tables if they don't exist.
-        
-        Creates the 'history' table with the following schema:
-        - id: Primary key (auto-increment)
-        - filename: Name of the analyzed file or 'text_input'
-        - timestamp: ISO 8601 formatted timestamp
-        - result: Analysis result verdict
-        - score: Confidence score (0-100)
-        - language: Detected programming language
-        - patterns: JSON string of detected patterns
-        - analysis_data: Full analysis results as JSON
-        """
+        # Initialize database and create tables
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
@@ -82,16 +55,11 @@ class DatabaseManager:
     
     @contextmanager
     def get_connection(self):
-        """
-        Context manager for database connections.
-        
-        Yields:
-            sqlite3.Connection: Database connection
-        """
+        # Database connection context manager
         conn = None
         try:
             conn = sqlite3.connect(self.db_path)
-            conn.row_factory = sqlite3.Row  # Enable dict-like access to rows
+            conn.row_factory = sqlite3.Row  # Enable dict-like access
             yield conn
         except sqlite3.Error as e:
             if conn:
@@ -111,20 +79,7 @@ class DatabaseManager:
         patterns: List[str] = None,
         analysis_data: Dict[str, Any] = None
     ) -> int:
-        """
-        Log an analysis result to the database.
-        
-        Args:
-            filename: Name of the analyzed file or 'text_input'
-            result: Analysis result verdict
-            score: Confidence score (0-100)
-            language: Detected programming language
-            patterns: List of detected patterns
-            analysis_data: Full analysis results
-            
-        Returns:
-            int: ID of the inserted record
-        """
+        # Log analysis result to database
         try:
             timestamp = datetime.now().isoformat()
             patterns_json = json.dumps(patterns) if patterns else "[]"
@@ -158,15 +113,7 @@ class DatabaseManager:
             raise
     
     def get_history(self, limit: int = 100) -> List[Dict[str, Any]]:
-        """
-        Retrieve analysis history from the database.
-        
-        Args:
-            limit: Maximum number of records to return
-            
-        Returns:
-            List of analysis records as dictionaries
-        """
+        # Get analysis history from database
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
@@ -180,7 +127,7 @@ class DatabaseManager:
                 
                 rows = cursor.fetchall()
                 
-                # Convert rows to dictionaries and parse JSON fields
+                # Convert rows to dictionaries and parse JSON
                 records = []
                 for row in rows:
                     record = dict(row)
@@ -208,15 +155,7 @@ class DatabaseManager:
             raise
     
     def get_analysis_details(self, record_id: int) -> Optional[Dict[str, Any]]:
-        """
-        Get detailed analysis data for a specific record.
-        
-        Args:
-            record_id: ID of the record
-            
-        Returns:
-            Full analysis data or None if not found
-        """
+        # Get detailed analysis data for specific record
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
@@ -241,12 +180,7 @@ class DatabaseManager:
             raise
     
     def get_stats(self) -> Dict[str, Any]:
-        """
-        Get analysis statistics from the database.
-        
-        Returns:
-            Dictionary with various statistics
-        """
+        # Get analysis statistics from database
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
@@ -293,12 +227,7 @@ _db_instance: Optional[DatabaseManager] = None
 
 
 def get_database() -> DatabaseManager:
-    """
-    Get the global database instance (singleton pattern).
-    
-    Returns:
-        DatabaseManager: The database manager instance
-    """
+    # Get global database instance (singleton)
     global _db_instance
     if _db_instance is None:
         _db_instance = DatabaseManager()
@@ -306,5 +235,5 @@ def get_database() -> DatabaseManager:
 
 
 def init_database() -> None:
-    """Initialize the database. Called on application startup."""
+    # Initialize database on startup
     get_database()
