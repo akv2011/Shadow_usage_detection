@@ -229,7 +229,7 @@
           2,
           3
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -242,7 +242,7 @@
         "dependencies": [
           6
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -255,7 +255,7 @@
         "dependencies": [
           2
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -269,21 +269,67 @@
           6,
           7
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
         "id": 10,
         "title": "Implement Code Style Inconsistency Detector",
-        "description": "Add an advanced detection feature to identify when coding style (e.g., indentation, spacing, naming conventions) changes within a single file, which can indicate AI-injected code.",
-        "details": "Extend the engine's AST analysis. For each function or class node, compute a style 'fingerprint' (e.g., a hash based on indentation type, variable name style, comment density). Compare these fingerprints across different nodes in the file. If a significant deviation is found, flag it as a 'Style Inconsistency' pattern.",
-        "testStrategy": "Create test files where one function is written in a different style (e.g., tabs vs. spaces, different variable casing). Run the detector and assert that it correctly flags the inconsistent function. Test with a consistently styled file to ensure no false positives.",
-        "priority": "medium",
+        "description": "Add an advanced detection feature to identify when coding style (e.g., indentation, spacing, naming conventions) changes within a single file, which can indicate AI-injected code. This feature is now complete and integrated into the main analysis engine.",
+        "status": "done",
         "dependencies": [
           2
         ],
-        "status": "pending",
-        "subtasks": []
+        "priority": "medium",
+        "details": "Implemented a core function `analyze_style_inconsistency()` that creates style fingerprints for each function and class. The analysis includes: indentation style (tabs vs. spaces), naming conventions (snake_case, camelCase, PascalCase), comment density, and line length variance. The detector is fully integrated into the main `analyze()` function in `engine.py`, the scoring system in `scoring.py`, and the CLI output.",
+        "testStrategy": "Created a comprehensive test suite `test_style_inconsistency.py` with 11 passing test cases covering consistent code, mixed indentation, mixed naming conventions, comment density differences, and line length patterns. End-to-end verification was performed using the CLI on a test file with mixed styles, confirming correct detection and integration with the confidence score.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Develop style fingerprinting function",
+            "description": "Create the `analyze_style_inconsistency` function to analyze and fingerprint indentation, naming, comment density, and line length.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Integrate detector into analysis engine",
+            "description": "Add the style inconsistency check to the main `analyze()` function in `engine.py`.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Update scoring system",
+            "description": "Add appropriate weights for style inconsistency findings to the scoring logic in `scoring.py`.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Create unit tests",
+            "description": "Implement 11 unit tests in `test_style_inconsistency.py` to cover all detection scenarios and edge cases.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Perform end-to-end CLI testing",
+            "description": "Verify the full feature from detection to scoring and output using the CLI and real-world test files.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 11,
@@ -296,8 +342,61 @@
           6,
           7
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define and Create SQLite Database Schema",
+            "description": "Implement a Python module to initialize the SQLite database file and create the 'history' table with the specified schema if it does not already exist.",
+            "dependencies": [],
+            "details": "Using Python's `sqlite3` module, create a function that executes a `CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY AUTOINCREMENT, filename TEXT NOT NULL, timestamp TEXT NOT NULL, result TEXT NOT NULL, score INTEGER NOT NULL);`. This function should be called on application startup.",
+            "status": "done",
+            "testStrategy": "Run the application startup sequence. Verify that a database file (e.g., `history.db`) is created. Use a database inspection tool to confirm the 'history' table exists with the correct columns and data types."
+          },
+          {
+            "id": 2,
+            "title": "Integrate Analysis Logging into Backend API",
+            "description": "Modify the existing backend analysis endpoint to save the results of each analysis—filename, timestamp, result, and score—into the 'history' table.",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "After an analysis is completed within the main API logic, gather the results. Connect to the SQLite database and execute an `INSERT` statement to add the new record. Ensure the timestamp is stored in a consistent format like ISO 8601.",
+            "status": "done",
+            "testStrategy": "Perform several analyses via the web UI. Query the `history` table directly to verify that a new row has been added for each analysis with the correct filename, timestamp, result, and score."
+          },
+          {
+            "id": 3,
+            "title": "Create `/api/history` Endpoint for Data Retrieval",
+            "description": "Implement a new GET endpoint at `/api/history` that queries the SQLite database, retrieves all records from the 'history' table, and returns them as a JSON response.",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "Add a new route to the backend web framework. The handler for this route will execute a `SELECT * FROM history ORDER BY timestamp DESC` query. The fetched rows should be converted into a list of dictionaries and returned as a JSON array.",
+            "status": "done",
+            "testStrategy": "After logging several analyses, access the `/api/history` endpoint using a browser or API client like Postman. Verify the response is a 200 OK with a valid JSON array containing all the logged records."
+          },
+          {
+            "id": 4,
+            "title": "Create Basic HTML Structure for `/dashboard` Page",
+            "description": "Create a new route `/dashboard` that serves a new `dashboard.html` template. This page will contain the basic layout and an empty table for displaying the history.",
+            "dependencies": [],
+            "details": "Create a `dashboard.html` file in the templates directory. The file should include a title and an HTML table with a `<thead>` containing headers for 'Filename', 'Timestamp', 'Result', and 'Score'. Create a corresponding backend route to render this template.",
+            "status": "done",
+            "testStrategy": "Start the web server and navigate to the `/dashboard` URL in a browser. Verify that the page loads correctly and displays the static elements, including the empty table with its headers."
+          },
+          {
+            "id": 5,
+            "title": "Populate Dashboard Table with Data from API",
+            "description": "Add client-side JavaScript to the dashboard page to fetch data from the `/api/history` endpoint on page load and dynamically populate the HTML table.",
+            "dependencies": [
+              "11.3",
+              "11.4"
+            ],
+            "details": "In a `<script>` tag on `dashboard.html`, use the `fetch` API to make a GET request to `/api/history`. Upon receiving the JSON response, iterate through the records and dynamically create and insert `<tr>` and `<td>` elements into the table body.",
+            "status": "done",
+            "testStrategy": "Load the `/dashboard` page in a browser. Open the developer tools to monitor network requests. Verify a successful request is made to `/api/history` and that the table on the page is populated with the data returned from the API."
+          }
+        ]
       },
       {
         "id": 12,
@@ -314,13 +413,65 @@
           10,
           11
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Draft Core README Sections (Overview & Output Format)",
+            "description": "Create the `README.md` file and write the initial sections, including a compelling project overview and a clear explanation of the analysis output format. This sets the foundation for the rest of the documentation.",
+            "dependencies": [],
+            "details": "In the `README.md`, write a 'Project Overview' section explaining what the tool does and its purpose. Create an 'Output Format' section that details the meaning of 'Verdict', 'Confidence', and 'Patterns Found', referencing the format established in Task 5.",
+            "status": "done",
+            "testStrategy": "Review the written sections for clarity, accuracy, and completeness. Ensure the output format explanation matches the actual tool output."
+          },
+          {
+            "id": 2,
+            "title": "Document Installation and Usage Instructions in README",
+            "description": "Add comprehensive installation and usage instructions to the `README.md` for both the Command-Line Interface (CLI) and the web frontend, ensuring a new user can get started without assistance.",
+            "dependencies": [
+              "12.1"
+            ],
+            "details": "Provide step-by-step instructions for cloning the repo, setting up the Python environment, and installing dependencies. Detail how to run the web server for the web UI. For the CLI, provide usage examples for every command, showing the command itself and its expected output.",
+            "status": "done",
+            "testStrategy": "Follow the instructions from a clean environment to verify they are correct. This is the primary test mentioned in the parent task's test strategy."
+          },
+          {
+            "id": 3,
+            "title": "Implement CLI Integration Tests",
+            "description": "Develop a suite of integration tests for the Command-Line Interface to verify that it correctly processes various inputs (files, strings) and produces the expected output format and exit codes.",
+            "dependencies": [],
+            "details": "In the `/tests` directory, create a new test file for CLI integration. Use Python's `subprocess` module or a test framework's CLI runner to execute the main script with different arguments. Test with sample files containing AI-generated and human-written code. Assert that `stdout` matches the expected output format.",
+            "status": "done",
+            "testStrategy": "Run the tests and ensure they cover different command-line arguments and edge cases, such as non-existent files or invalid arguments."
+          },
+          {
+            "id": 4,
+            "title": "Expand API Test Coverage",
+            "description": "Write unit and integration tests for all backend API endpoints to ensure they are robust and handle requests correctly. This includes the main analysis endpoint and the quiz endpoint.",
+            "dependencies": [],
+            "details": "Using a test client (e.g., from Flask or FastAPI), write tests for the `/api/analyze` and `/api/quiz` endpoints. For `/api/analyze`, test with valid code, empty input, and malformed requests. For `/api/quiz`, verify that the endpoint returns the correct JSON structure. Ensure all tests are added to the `/tests` directory.",
+            "status": "done",
+            "testStrategy": "Check that tests cover both successful (200 OK) and error (e.g., 400 Bad Request) responses from the API. Verify the content and structure of the JSON responses."
+          },
+          {
+            "id": 5,
+            "title": "Achieve 80% Code Coverage and Finalize",
+            "description": "Run the complete test suite with a coverage tool, identify untested code paths, and add the necessary unit tests to meet the 80% coverage target. Perform a final validation of the documentation.",
+            "dependencies": [
+              "12.2",
+              "12.3",
+              "12.4"
+            ],
+            "details": "Use a tool like `pytest-cov` to generate a coverage report (`pytest --cov=shadow_ai`). Analyze the report to find modules or functions with low coverage. Write targeted unit tests for helper functions, edge cases in the detection engine, and any other logic not covered by integration tests. Finally, ask a new user to follow the `README.md` to confirm its effectiveness.",
+            "status": "done",
+            "testStrategy": "Verify that the `pytest-cov` command reports a total coverage of 80% or higher. Confirm that a new user can successfully install and run the tool using only the `README.md`."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-08-04T09:46:46.647Z",
-      "updated": "2025-08-04T14:56:39.528Z",
+      "updated": "2025-08-04T19:20:34.651Z",
       "description": "Tasks for master context"
     }
   }

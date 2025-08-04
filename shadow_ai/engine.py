@@ -10,6 +10,7 @@ analysis, and AI language pattern matching.
 import re
 import ast
 from typing import Dict, List, Any, Union
+from .scoring import ConfidenceScorer
 
 
 def analyze_comment_patterns(code_string: str) -> Dict[str, Any]:
@@ -701,6 +702,427 @@ def _calculate_ai_language_confidence(
     return round(min(confidence, 100.0), 2)
 
 
+def analyze_style_inconsistency(code_string: str) -> Dict[str, Any]:
+    """
+    Analyze code for style inconsistencies that may indicate AI-injected content.
+    
+    This function creates 'style fingerprints' for different parts of the code
+    (functions, classes) and compares them to detect significant variations in:
+    - Indentation style (tabs vs spaces, different amounts)
+    - Variable naming conventions (camelCase vs snake_case)
+    - Comment density and style
+    - Line length patterns
+    
+    Args:
+        code_string (str): The source code to analyze
+        
+    Returns:
+        Dict[str, Any]: Dictionary containing analysis results:
+            - 'style_fingerprints': List of style fingerprints for each code block
+            - 'inconsistency_count': Number of style inconsistencies detected
+            - 'inconsistency_score': Score from 0-100 indicating style uniformity
+            - 'inconsistent_patterns': List of specific inconsistencies found
+            - 'total_code_blocks': Total number of analyzable code blocks
+    """
+    if not code_string or not isinstance(code_string, str):
+        return {
+            'style_fingerprints': [],
+            'inconsistency_count': 0,
+            'inconsistency_score': 0.0,
+            'inconsistent_patterns': [],
+            'total_code_blocks': 0
+        }
+    
+    try:
+        # Parse the code into an AST
+        tree = ast.parse(code_string)
+    except SyntaxError:
+        # Return neutral results for invalid code
+        return {
+            'style_fingerprints': [],
+            'inconsistency_count': 0,
+            'inconsistency_score': 0.0,
+            'inconsistent_patterns': [],
+            'total_code_blocks': 0
+        }
+    
+    lines = code_string.split('\n')
+    style_fingerprints = []
+    
+    # Analyze each function and class for style patterns
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)):
+            fingerprint = _create_style_fingerprint(node, lines)
+            if fingerprint:
+                style_fingerprints.append(fingerprint)
+    
+    # If we don't have enough code blocks, analyze the global scope
+    if len(style_fingerprints) < 2:
+        global_fingerprint = _create_global_style_fingerprint(lines)
+        if global_fingerprint and len(style_fingerprints) == 0:
+            style_fingerprints.append(global_fingerprint)
+    
+    total_code_blocks = len(style_fingerprints)
+    
+    if total_code_blocks < 2:
+        # Need at least 2 blocks to compare styles
+        return {
+            'style_fingerprints': style_fingerprints,
+            'inconsistency_count': 0,
+            'inconsistency_score': 0.0,
+            'inconsistent_patterns': [],
+            'total_code_blocks': total_code_blocks
+        }
+    
+    # Compare style fingerprints to detect inconsistencies
+    inconsistencies = _detect_style_inconsistencies(style_fingerprints)
+    
+    # Calculate inconsistency score (0-100, higher means more inconsistent)
+    inconsistency_score = _calculate_style_inconsistency_score(inconsistencies, total_code_blocks)
+    
+    return {
+        'style_fingerprints': style_fingerprints,
+        'inconsistency_count': len(inconsistencies),
+        'inconsistency_score': inconsistency_score,
+        'inconsistent_patterns': inconsistencies,
+        'total_code_blocks': total_code_blocks
+    }
+
+
+def _create_style_fingerprint(node: ast.AST, lines: List[str]) -> Dict[str, Any]:
+    """
+    Create a style fingerprint for a specific AST node (function or class).
+    
+    Args:
+        node (ast.AST): The AST node to analyze
+        lines (List[str]): All lines of the source code
+        
+    Returns:
+        Dict[str, Any]: Style fingerprint containing various style metrics
+    """
+    if not hasattr(node, 'lineno') or not hasattr(node, 'end_lineno'):
+        return None
+    
+    start_line = node.lineno - 1  # Convert to 0-based indexing
+    end_line = node.end_lineno if node.end_lineno else start_line + 1
+    
+    # Extract the lines for this code block
+    if start_line >= len(lines) or end_line > len(lines):
+        return None
+    
+    block_lines = lines[start_line:end_line]
+    
+    # Analyze indentation style
+    indentation_style = _analyze_indentation_style(block_lines)
+    
+    # Analyze variable naming patterns
+    naming_style = _analyze_naming_style(node)
+    
+    # Analyze comment patterns
+    comment_style = _analyze_comment_style(block_lines)
+    
+    # Analyze line length patterns
+    line_length_style = _analyze_line_length_style(block_lines)
+    
+    return {
+        'node_type': type(node).__name__,
+        'node_name': getattr(node, 'name', 'anonymous'),
+        'line_range': (start_line + 1, end_line),
+        'indentation_style': indentation_style,
+        'naming_style': naming_style,
+        'comment_style': comment_style,
+        'line_length_style': line_length_style
+    }
+
+
+def _create_global_style_fingerprint(lines: List[str]) -> Dict[str, Any]:
+    """
+    Create a style fingerprint for the global scope when no functions/classes exist.
+    
+    Args:
+        lines (List[str]): All lines of the source code
+        
+    Returns:
+        Dict[str, Any]: Style fingerprint for global scope
+    """
+    # Use the entire file as one block
+    indentation_style = _analyze_indentation_style(lines)
+    comment_style = _analyze_comment_style(lines)
+    line_length_style = _analyze_line_length_style(lines)
+    
+    return {
+        'node_type': 'Global',
+        'node_name': 'global_scope',
+        'line_range': (1, len(lines)),
+        'indentation_style': indentation_style,
+        'naming_style': {'style': 'unknown', 'consistency': 1.0},
+        'comment_style': comment_style,
+        'line_length_style': line_length_style
+    }
+
+
+def _analyze_indentation_style(block_lines: List[str]) -> Dict[str, Any]:
+    """
+    Analyze indentation patterns in a code block.
+    
+    Args:
+        block_lines (List[str]): Lines of code to analyze
+        
+    Returns:
+        Dict[str, Any]: Indentation style analysis
+    """
+    tab_count = 0
+    space_counts = {}
+    total_indented_lines = 0
+    
+    for line in block_lines:
+        if not line.strip():  # Skip empty lines
+            continue
+            
+        # Count leading whitespace
+        leading_chars = len(line) - len(line.lstrip())
+        if leading_chars > 0:
+            total_indented_lines += 1
+            
+            if line.startswith('\t'):
+                tab_count += 1
+            else:
+                # Count spaces
+                space_count = 0
+                for char in line:
+                    if char == ' ':
+                        space_count += 1
+                    else:
+                        break
+                
+                if space_count > 0:
+                    space_counts[space_count] = space_counts.get(space_count, 0) + 1
+    
+    # Determine primary style
+    if total_indented_lines == 0:
+        return {'style': 'none', 'consistency': 1.0, 'tab_count': 0, 'space_counts': {}}
+    
+    if tab_count > len(space_counts):
+        primary_style = 'tabs'
+        consistency = tab_count / total_indented_lines
+    else:
+        primary_style = 'spaces'
+        if space_counts:
+            most_common_spaces = max(space_counts.values())
+            consistency = most_common_spaces / total_indented_lines
+        else:
+            consistency = 0.0
+    
+    return {
+        'style': primary_style,
+        'consistency': round(consistency, 3),
+        'tab_count': tab_count,
+        'space_counts': space_counts
+    }
+
+
+def _analyze_naming_style(node: ast.AST) -> Dict[str, Any]:
+    """
+    Analyze variable and function naming patterns in an AST node.
+    
+    Args:
+        node (ast.AST): The AST node to analyze
+        
+    Returns:
+        Dict[str, Any]: Naming style analysis
+    """
+    names = []
+    
+    # Extract variable and function names from the node
+    for child in ast.walk(node):
+        if isinstance(child, ast.Name) and isinstance(child.ctx, ast.Store):
+            names.append(child.id)
+        elif isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if child != node:  # Don't include the current node's name twice
+                names.append(child.name)
+        elif isinstance(child, ast.arg):
+            names.append(child.arg)
+    
+    if not names:
+        return {'style': 'unknown', 'consistency': 1.0}
+    
+    # Analyze naming conventions
+    snake_case_count = 0
+    camel_case_count = 0
+    pascal_case_count = 0
+    
+    for name in names:
+        if '_' in name and name.islower():
+            snake_case_count += 1
+        elif name[0].islower() and any(c.isupper() for c in name[1:]):
+            camel_case_count += 1
+        elif name[0].isupper() and any(c.isupper() for c in name[1:]):
+            pascal_case_count += 1
+    
+    total_names = len(names)
+    
+    # Determine primary style
+    style_counts = {
+        'snake_case': snake_case_count,
+        'camelCase': camel_case_count,
+        'PascalCase': pascal_case_count
+    }
+    
+    primary_style = max(style_counts, key=style_counts.get)
+    consistency = style_counts[primary_style] / total_names
+    
+    return {
+        'style': primary_style,
+        'consistency': round(consistency, 3)
+    }
+
+
+def _analyze_comment_style(block_lines: List[str]) -> Dict[str, Any]:
+    """
+    Analyze comment patterns in a code block.
+    
+    Args:
+        block_lines (List[str]): Lines of code to analyze
+        
+    Returns:
+        Dict[str, Any]: Comment style analysis
+    """
+    total_lines = len([line for line in block_lines if line.strip()])
+    comment_lines = 0
+    inline_comments = 0
+    block_comments = 0
+    
+    for line in block_lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+            
+        if stripped.startswith('#'):
+            comment_lines += 1
+            block_comments += 1
+        elif '#' in line:
+            comment_lines += 1
+            inline_comments += 1
+    
+    if total_lines == 0:
+        comment_density = 0.0
+    else:
+        comment_density = comment_lines / total_lines
+    
+    return {
+        'comment_density': round(comment_density, 3),
+        'inline_comments': inline_comments,
+        'block_comments': block_comments
+    }
+
+
+def _analyze_line_length_style(block_lines: List[str]) -> Dict[str, Any]:
+    """
+    Analyze line length patterns in a code block.
+    
+    Args:
+        block_lines (List[str]): Lines of code to analyze
+        
+    Returns:
+        Dict[str, Any]: Line length style analysis
+    """
+    non_empty_lines = [line for line in block_lines if line.strip()]
+    
+    if not non_empty_lines:
+        return {'average_length': 0.0, 'max_length': 0, 'variance': 0.0}
+    
+    lengths = [len(line) for line in non_empty_lines]
+    average_length = sum(lengths) / len(lengths)
+    max_length = max(lengths)
+    
+    # Calculate variance
+    variance = sum((length - average_length) ** 2 for length in lengths) / len(lengths)
+    
+    return {
+        'average_length': round(average_length, 1),
+        'max_length': max_length,
+        'variance': round(variance, 1)
+    }
+
+
+def _detect_style_inconsistencies(style_fingerprints: List[Dict[str, Any]]) -> List[str]:
+    """
+    Compare style fingerprints to detect inconsistencies.
+    
+    Args:
+        style_fingerprints (List[Dict[str, Any]]): List of style fingerprints to compare
+        
+    Returns:
+        List[str]: List of detected inconsistencies
+    """
+    inconsistencies = []
+    
+    if len(style_fingerprints) < 2:
+        return inconsistencies
+    
+    # Check indentation style consistency
+    indentation_styles = [fp['indentation_style']['style'] for fp in style_fingerprints]
+    unique_indentation_styles = set(indentation_styles)
+    
+    if len(unique_indentation_styles) > 1:
+        inconsistencies.append(f"Mixed indentation styles: {', '.join(unique_indentation_styles)}")
+    
+    # Check naming style consistency
+    naming_styles = [fp['naming_style']['style'] for fp in style_fingerprints]
+    unique_naming_styles = set(naming_styles)
+    
+    if len(unique_naming_styles) > 1 and 'unknown' not in unique_naming_styles:
+        inconsistencies.append(f"Mixed naming conventions: {', '.join(unique_naming_styles)}")
+    
+    # Check for significant differences in comment density
+    comment_densities = [fp['comment_style']['comment_density'] for fp in style_fingerprints]
+    if comment_densities:
+        max_density = max(comment_densities)
+        min_density = min(comment_densities)
+        
+        if max_density - min_density > 0.5:  # More than 50% difference
+            inconsistencies.append(f"Inconsistent comment density: {min_density:.1f} to {max_density:.1f}")
+    
+    # Check for significant differences in line length patterns
+    line_length_variances = [fp['line_length_style']['variance'] for fp in style_fingerprints]
+    if line_length_variances:
+        max_variance = max(line_length_variances)
+        min_variance = min(line_length_variances)
+        
+        if max_variance > 0 and min_variance > 0:
+            variance_ratio = max_variance / min_variance
+            if variance_ratio > 3.0:  # One block has 3x more line length variance
+                inconsistencies.append(f"Inconsistent line length patterns: variance ratio {variance_ratio:.1f}")
+    
+    return inconsistencies
+
+
+def _calculate_style_inconsistency_score(inconsistencies: List[str], total_blocks: int) -> float:
+    """
+    Calculate a score representing the level of style inconsistency.
+    
+    Args:
+        inconsistencies (List[str]): List of detected inconsistencies
+        total_blocks (int): Total number of code blocks analyzed
+        
+    Returns:
+        float: Inconsistency score from 0-100 (higher = more inconsistent)
+    """
+    if not inconsistencies or total_blocks < 2:
+        return 0.0
+    
+    # Base score depends on number of inconsistencies
+    base_score = len(inconsistencies) * 20
+    
+    # Adjust based on the number of code blocks
+    # More blocks with inconsistencies is more suspicious
+    block_factor = min(total_blocks / 3, 2.0)  # Cap at 2x multiplier
+    
+    final_score = base_score * block_factor
+    
+    return round(min(final_score, 100.0), 1)
+
+
 def analyze(code_string: str) -> Dict[str, Any]:
     """
     Main orchestrator function that runs all heuristic checks on code.
@@ -750,6 +1172,13 @@ def analyze(code_string: str) -> Dict[str, Any]:
                 'disclaimer_patterns': 0,
                 'confidence_level': 0.0
             },
+            'style_inconsistency': {
+                'style_fingerprints': [],
+                'inconsistency_count': 0,
+                'inconsistency_score': 0.0,
+                'inconsistent_patterns': [],
+                'total_code_blocks': 0
+            },
             'summary': {
                 'total_indicators': 0,
                 'risk_factors': [],
@@ -758,7 +1187,7 @@ def analyze(code_string: str) -> Dict[str, Any]:
             'analysis_metadata': {
                 'code_length': 0,
                 'analysis_timestamp': None,
-                'heuristics_run': 4,
+                'heuristics_run': 5,
                 'errors_encountered': []
             }
         }
@@ -816,17 +1245,94 @@ def analyze(code_string: str) -> Dict[str, Any]:
             'disclaimer_patterns': 0,
             'confidence_level': 0.0
         }
+
+    try:
+        style_results = analyze_style_inconsistency(code_string)
+    except Exception as e:
+        errors_encountered.append(f"Style analysis error: {str(e)}")
+        style_results = {
+            'style_fingerprints': [],
+            'inconsistency_count': 0,
+            'inconsistency_score': 0.0,
+            'inconsistent_patterns': [],
+            'total_code_blocks': 0
+        }
+
+    # Calculate summary statistics using the new sophisticated scoring system
+    heuristic_results = {
+        'comment_patterns': comment_results,
+        'variable_names': variable_results,
+        'code_structure': structure_results,
+        'ai_language_patterns': ai_language_results,
+        'style_inconsistency': style_results
+    }    # Calculate basic metrics for backward compatibility
+    total_indicators = 0
+    risk_factors = []
     
-    # Calculate summary statistics
-    summary = _calculate_summary_statistics(
-        comment_results, variable_results, structure_results, ai_language_results
-    )
+    # Analyze comment patterns
+    if comment_results['generic_comments'] > 0:
+        risk_factors.append(f"Generic comments detected ({comment_results['generic_comments']})")
+        total_indicators += comment_results['generic_comments']
+    
+    if comment_results['comment_to_code_ratio'] > 0.8:
+        risk_factors.append(f"High comment-to-code ratio ({comment_results['comment_to_code_ratio']})")
+        total_indicators += 1
+    
+    if comment_results['repetitive_patterns'] > 0:
+        risk_factors.append(f"Repetitive comment patterns ({comment_results['repetitive_patterns']})")
+        total_indicators += 1
+    
+    # Analyze variable naming
+    if variable_results['generic_percentage'] > 50:
+        risk_factors.append(f"High generic variable usage ({variable_results['generic_percentage']}%)")
+        total_indicators += 1
+    
+    # Analyze code structure
+    if structure_results['structural_uniformity_score'] > 60:
+        risk_factors.append(f"High structural uniformity ({structure_results['structural_uniformity_score']})")
+        total_indicators += 1
+    
+    if structure_results['function_length_variance'] < 2.0 and structure_results['total_functions'] > 1:
+        risk_factors.append(f"Low function length variance ({structure_results['function_length_variance']})")
+        total_indicators += 1
+    
+    # Analyze AI language patterns
+    if ai_language_results['ai_phrase_count'] > 0:
+        risk_factors.append(f"AI language phrases detected ({ai_language_results['ai_phrase_count']})")
+        total_indicators += ai_language_results['ai_phrase_count']
+    
+    if ai_language_results['confidence_level'] > 50:
+        risk_factors.append(f"High AI language confidence ({ai_language_results['confidence_level']}%)")
+        total_indicators += 1
+    
+    # Analyze style inconsistency
+    if style_results['inconsistency_score'] > 40:
+        risk_factors.append(f"Style inconsistency detected ({style_results['inconsistency_score']})")
+        total_indicators += 1
+    
+    if style_results['inconsistency_count'] > 0:
+        patterns = ', '.join(style_results['inconsistent_patterns'][:2])  # Show first 2 patterns
+        risk_factors.append(f"Style patterns: {patterns}")
+        total_indicators += style_results['inconsistency_count']
+    
+    # Use the new confidence scoring system
+    scoring_results = ConfidenceScorer.calculate_confidence_score(heuristic_results)
+    
+    # Create summary with both old and new scoring for compatibility
+    summary = {
+        'total_indicators': total_indicators,
+        'risk_factors': risk_factors,
+        'overall_suspicion_score': scoring_results['confidence_score'],
+        'risk_level': scoring_results['risk_level'],
+        'component_scores': scoring_results['component_scores'],
+        'weighted_factors': scoring_results['weighted_factors']
+    }
     
     # Prepare analysis metadata
     analysis_metadata = {
         'code_length': len(code_string),
         'analysis_timestamp': analysis_timestamp,
-        'heuristics_run': 4,
+        'heuristics_run': 5,
         'errors_encountered': errors_encountered
     }
     
@@ -836,6 +1342,7 @@ def analyze(code_string: str) -> Dict[str, Any]:
         'variable_names': variable_results,
         'code_structure': structure_results,
         'ai_language_patterns': ai_language_results,
+        'style_inconsistency': style_results,
         'summary': summary,
         'analysis_metadata': analysis_metadata
     }

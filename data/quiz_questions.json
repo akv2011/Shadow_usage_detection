@@ -1,0 +1,94 @@
+{
+  "quiz_questions": [
+    {
+      "id": 1,
+      "question": "Is this code snippet likely AI-generated or human-written?",
+      "code": "def calculate_factorial(n):\n    \"\"\"\n    Calculate the factorial of a given number.\n    \n    Args:\n        n (int): The number to calculate factorial for\n        \n    Returns:\n        int: The factorial of n\n    \"\"\"\n    if n == 0 or n == 1:\n        return 1\n    else:\n        return n * calculate_factorial(n - 1)",
+      "language": "python",
+      "correct_answer": "AI",
+      "explanation": "This code shows classic AI patterns: overly detailed docstring with Args/Returns formatting, perfect recursive implementation with explicit base cases, and formal parameter documentation. The verbose documentation style is characteristic of AI-generated code.",
+      "patterns": ["verbose_documentation", "formal_structure", "perfect_recursion"]
+    },
+    {
+      "id": 2,
+      "question": "Is this code snippet likely AI-generated or human-written?",
+      "code": "def fib(n):\n    if n <= 1: return n\n    return fib(n-1) + fib(n-2)\n\n# quick test\nprint(fib(10))",
+      "language": "python", 
+      "correct_answer": "Human",
+      "explanation": "This code shows human characteristics: concise function name (fib vs fibonacci), compact one-liner conditional, minimal documentation, and informal testing comment. The casual style and brevity suggest human authorship.",
+      "patterns": ["concise_naming", "minimal_documentation", "informal_testing"]
+    },
+    {
+      "id": 3,
+      "question": "Is this code snippet likely AI-generated or human-written?",
+      "code": "function processUserData(userData) {\n    // Validate input parameters\n    if (!userData || typeof userData !== 'object') {\n        throw new Error('Invalid input: userData must be a valid object');\n    }\n    \n    // Extract and validate required fields\n    const { name, email, age } = userData;\n    \n    if (!name || typeof name !== 'string') {\n        throw new Error('Invalid input: name is required and must be a string');\n    }\n    \n    // Process the validated data\n    return {\n        processedName: name.trim().toLowerCase(),\n        processedEmail: email ? email.toLowerCase() : null,\n        processedAge: age || null\n    };\n}",
+      "language": "javascript",
+      "correct_answer": "AI",
+      "explanation": "This shows AI patterns: excessive input validation, verbose error messages, step-by-step comments explaining obvious operations, and overly defensive programming. The systematic approach and redundant validation are typical of AI-generated code.",
+      "patterns": ["excessive_validation", "verbose_comments", "defensive_programming"]
+    },
+    {
+      "id": 4,
+      "question": "Is this code snippet likely AI-generated or human-written?", 
+      "code": "const users = [\n    { name: 'Alice', age: 25 },\n    { name: 'Bob', age: 30 },\n    { name: 'Charlie', age: 35 }\n];\n\n// filter adults\nconst adults = users.filter(u => u.age >= 18);\nconsole.log(adults);",
+      "language": "javascript",
+      "correct_answer": "Human",
+      "explanation": "This code demonstrates human patterns: simple test data, minimal variable names (u instead of user), basic functionality without over-engineering, and straightforward implementation. The casual comment style and lack of defensive programming suggest human authorship.",
+      "patterns": ["simple_test_data", "minimal_naming", "basic_functionality"]
+    },
+    {
+      "id": 5,
+      "question": "Is this code snippet likely AI-generated or human-written?",
+      "code": "public class DataProcessor {\n    /**\n     * Processes a list of data items and returns the processed results.\n     * \n     * @param dataItems The list of data items to process\n     * @param processingOptions The options for processing\n     * @return A list of processed data items\n     * @throws IllegalArgumentException if dataItems is null or empty\n     */\n    public List<ProcessedData> processData(\n            List<DataItem> dataItems, \n            ProcessingOptions processingOptions) {\n        \n        // Validate input parameters\n        if (dataItems == null || dataItems.isEmpty()) {\n            throw new IllegalArgumentException(\n                \"Data items list cannot be null or empty\");\n        }\n        \n        // Initialize result list\n        List<ProcessedData> result = new ArrayList<>();\n        \n        // Process each data item\n        for (DataItem item : dataItems) {\n            ProcessedData processedItem = processItem(item, processingOptions);\n            result.add(processedItem);\n        }\n        \n        return result;\n    }\n}",
+      "language": "java",
+      "correct_answer": "AI", 
+      "explanation": "Classic AI-generated Java code: comprehensive JavaDoc with @param/@return tags, excessive input validation, verbose variable names, step-by-step comments for obvious operations, and formal exception handling. The overly structured approach is characteristic of AI.",
+      "patterns": ["comprehensive_javadoc", "excessive_validation", "verbose_naming", "formal_structure"]
+    },
+    {
+      "id": 6,
+      "question": "Is this code snippet likely AI-generated or human-written?",
+      "code": "def merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    \n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    \n    return merge(left, right)\n\ndef merge(left, right):\n    result = []\n    i = j = 0\n    \n    while i < len(left) and j < len(right):\n        if left[i] <= right[j]:\n            result.append(left[i])\n            i += 1\n        else:\n            result.append(right[j])\n            j += 1\n    \n    result.extend(left[i:])\n    result.extend(right[j:])\n    return result",
+      "language": "python",
+      "correct_answer": "Human",
+      "explanation": "This merge sort implementation shows human characteristics: no documentation, standard algorithm implementation without over-explanation, concise variable names (i, j), and direct approach without excessive validation. The focus on functionality over documentation suggests human authorship.",
+      "patterns": ["no_documentation", "standard_algorithm", "concise_variables", "direct_approach"]
+    },
+    {
+      "id": 7,
+      "question": "Is this code snippet likely AI-generated or human-written?",
+      "code": "#!/usr/bin/env python3\n\"\"\"\nWeather Data Analysis Module\n\nThis module provides comprehensive functionality for analyzing weather data,\nincluding temperature trends, precipitation patterns, and seasonal variations.\n\nAuthor: Weather Analysis System\nVersion: 1.0.0\nDate: 2024-01-15\n\"\"\"\n\nfrom typing import List, Dict, Optional, Tuple\nimport pandas as pd\nimport numpy as np\nfrom datetime import datetime, timedelta\n\n\nclass WeatherAnalyzer:\n    \"\"\"\n    A comprehensive weather data analyzer that provides various statistical\n    analysis methods for weather datasets.\n    \n    This class offers functionality to analyze temperature trends, calculate\n    precipitation statistics, and identify seasonal patterns in weather data.\n    \"\"\"\n    \n    def __init__(self, data_source: str) -> None:\n        \"\"\"\n        Initialize the WeatherAnalyzer with a data source.\n        \n        Args:\n            data_source (str): Path to the weather data file\n            \n        Raises:\n            ValueError: If data_source is None or empty\n            FileNotFoundError: If the specified file does not exist\n        \"\"\"\n        if not data_source:\n            raise ValueError(\"Data source cannot be None or empty\")\n        \n        self.data_source = data_source\n        self.data: Optional[pd.DataFrame] = None",
+      "language": "python",
+      "correct_answer": "AI",
+      "explanation": "This exhibits strong AI characteristics: excessive module-level documentation, formal author/version/date headers, comprehensive type hints, verbose class docstrings explaining obvious functionality, and defensive parameter validation. The over-documentation and formal structure are hallmarks of AI-generated code.",
+      "patterns": ["excessive_documentation", "formal_headers", "comprehensive_typing", "verbose_docstrings", "defensive_validation"]
+    },
+    {
+      "id": 8,
+      "question": "Is this code snippet likely AI-generated or human-written?",
+      "code": "import requests\nimport json\n\ndef get_user(user_id):\n    url = f\"https://api.example.com/users/{user_id}\"\n    resp = requests.get(url)\n    \n    if resp.status_code == 200:\n        return resp.json()\n    else:\n        return None\n\n# test it\nuser = get_user(123)\nif user:\n    print(f\"User: {user['name']}\")\nelse:\n    print(\"User not found\")",
+      "language": "python",
+      "correct_answer": "Human",
+      "explanation": "This code shows human patterns: minimal imports, short variable names (resp vs response), basic error handling without detailed messages, inline testing, and straightforward implementation. The lack of comprehensive error handling and documentation suggests human authorship.",
+      "patterns": ["minimal_imports", "short_variables", "basic_error_handling", "inline_testing", "straightforward_implementation"]
+    },
+    {
+      "id": 9,
+      "question": "Is this code snippet likely AI-generated or human-written?",
+      "code": "// This function implements a binary search algorithm\n// to find a target value in a sorted array\nfunction binarySearch(array, target) {\n    // Validate input parameters\n    if (!Array.isArray(array)) {\n        throw new Error('First parameter must be an array');\n    }\n    \n    if (array.length === 0) {\n        return -1; // Target not found in empty array\n    }\n    \n    // Initialize search boundaries\n    let leftIndex = 0;\n    let rightIndex = array.length - 1;\n    \n    // Continue searching while the search space is valid\n    while (leftIndex <= rightIndex) {\n        // Calculate the middle index to avoid overflow\n        const middleIndex = Math.floor((leftIndex + rightIndex) / 2);\n        const middleValue = array[middleIndex];\n        \n        // Check if we found the target\n        if (middleValue === target) {\n            return middleIndex; // Target found, return its index\n        }\n        \n        // Adjust search boundaries based on comparison\n        if (middleValue < target) {\n            leftIndex = middleIndex + 1; // Search right half\n        } else {\n            rightIndex = middleIndex - 1; // Search left half\n        }\n    }\n    \n    return -1; // Target not found in the array\n}",
+      "language": "javascript",
+      "correct_answer": "AI",
+      "explanation": "This binary search shows classic AI patterns: verbose comments explaining every step, formal variable naming (leftIndex vs left), input validation, detailed explanations of obvious operations, and over-commenting. The educational style with step-by-step explanations is typical of AI-generated code.",
+      "patterns": ["verbose_comments", "formal_naming", "input_validation", "educational_style", "over_commenting"]
+    },
+    {
+      "id": 10,
+      "question": "Is this code snippet likely AI-generated or human-written?",
+      "code": "class TodoList:\n    def __init__(self):\n        self.items = []\n    \n    def add(self, item):\n        self.items.append(item)\n    \n    def remove(self, item):\n        if item in self.items:\n            self.items.remove(item)\n    \n    def get_all(self):\n        return self.items\n\n# usage\ntodo = TodoList()\ntodo.add(\"buy milk\")\ntodo.add(\"walk dog\")\nprint(todo.get_all())",
+      "language": "python",
+      "correct_answer": "Human",
+      "explanation": "This TodoList class demonstrates human characteristics: minimal documentation, simple method names, basic functionality without over-engineering, straightforward implementation, and casual usage example. The lack of input validation and verbose documentation suggests human authorship.",
+      "patterns": ["minimal_documentation", "simple_methods", "basic_functionality", "straightforward_implementation", "casual_usage"]
+    }
+  ]
+}
