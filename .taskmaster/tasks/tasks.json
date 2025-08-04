@@ -9,7 +9,7 @@
         "testStrategy": "Verify that the repository is cloneable, the virtual environment can be created, dependencies can be installed via `pip install`, and `pytest` runs successfully (even with no tests). The CI pipeline should trigger and pass on the initial commit.",
         "priority": "high",
         "dependencies": [],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -52,8 +52,8 @@
             "title": "Implement Basic GitHub Actions CI Workflow",
             "description": "Create a continuous integration workflow using GitHub Actions that automatically validates code quality and runs tests on every push and pull request.",
             "dependencies": [],
-            "details": "Create a `.github/workflows/ci.yml` file. Define a workflow that triggers on `push` and `pull_request` to the main branch. The workflow should contain a single job with steps to: 1) Checkout code. 2) Set up Python 3.10. 3) Install project dependencies. 4) Run linter/formatter checks (`ruff check .` and `ruff format --check .`). 5) Run the test suite (`pytest`).",
-            "status": "in-progress",
+            "details": "Create a `.github/workflows/ci.yml` file. Define a workflow that triggers on `push` and `pull_request` to the main branch. The workflow should contain a single job with steps to: 1) Checkout code. 2) Set up Python 3.10. 3) Install project dependencies. 4) Run linter/formatter checks (`ruff check .` and `ruff format --check .`). 5) Run the test suite (`pytest`).\n<info added on 2025-08-04T10:40:52.141Z>\nThe implementation went significantly beyond the original scope, adding the following features:\n\nExpanded CI Workflow (ci.yml):\n- Multi-Python version testing matrix (3.9, 3.10, 3.11, 3.12).\n- Additional quality checks: mypy for type checking.\n- Security scanning: bandit and safety.\n- Test coverage reporting and integration with Codecov.\n- Triggers on push/pull_request to the 'develop' branch in addition to 'main'.\n\nNew Workflows:\n- An automated release workflow (release.yml) for GitHub Releases and PyPI publishing.\n- A Dependabot configuration (dependabot.yml) for automated dependency updates.\n\nTest Suite Expansion:\n- The test suite was built out to 15 passing tests, achieving 100% code coverage.\n\nDocumentation:\n- Updated README.md with CI/CD status badges and a development guide.\n- Added an MIT LICENSE file.\n</info added on 2025-08-04T10:40:52.141Z>",
+            "status": "done",
             "testStrategy": "Push the initial project structure to the GitHub repository. Navigate to the 'Actions' tab on GitHub and verify that the CI workflow is triggered and passes successfully."
           }
         ]
@@ -68,8 +68,59 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Comment Pattern Analysis Heuristic",
+            "description": "Develop the function to analyze comments in a code snippet for patterns indicative of AI generation, such as overly simplistic or repetitive comment structures.",
+            "dependencies": [],
+            "details": "In `engine.py`, create a function `analyze_comment_patterns(code_string)`. Use regular expressions to identify common, non-descriptive comment formats (e.g., `# [Function Name]`, `# [Variable Name]`) and check for high comment-to-code ratios. The function should return a raw metric, such as the count of matched patterns.\n<info added on 2025-08-04T11:02:29.680Z>\nThe `analyze_comment_patterns()` function has been implemented in `shadow_ai/engine.py`. It uses 14 regex patterns to detect generic AI-generated comments, calculates the comment-to-code ratio, and identifies repetitive comment structures via a helper function. The implementation is robust, handling edge cases like empty input. A comprehensive test suite in `tests/test_detection_engine.py` with 8 test cases was created, achieving 98% code coverage and validating functionality against various scenarios. The function returns a structured dictionary of metrics for integration with the confidence scoring module.\n</info added on 2025-08-04T11:02:29.680Z>",
+            "status": "done",
+            "testStrategy": "Create unit tests in `/tests/test_engine.py` with code snippets containing generic, repetitive comments and snippets with descriptive, human-like comments. Assert the correct pattern count is returned."
+          },
+          {
+            "id": 2,
+            "title": "Implement Variable Naming Analysis Heuristic",
+            "description": "Create the logic to check for the use of overly generic variable and function names, which are common in AI-generated code examples.",
+            "dependencies": [],
+            "details": "In `engine.py`, create a function `analyze_variable_names(code_string)`. Define a configurable list of common generic names (e.g., 'data', 'result', 'temp', 'item'). Use the `ast` module to parse the code, extract all variable and function names, and calculate the percentage of generic names found.\n<info added on 2025-08-04T11:07:46.959Z>\nThe implementation now uses a comprehensive database of over 50 common AI-generated names, including generic function names ('process', 'handle') and single-letter variables ('i', 'j', 'k'). The AST parsing is more thorough, extracting class names and function arguments in addition to variables and functions, while also filtering out built-in names and keywords to focus on user-defined identifiers. The function's output is a structured dictionary containing the count of generic names, the total count of names, the calculated percentage, and a list of the specific generic names found. It gracefully handles syntax errors in the input code by returning a neutral result. The feature is validated by a suite of 8 comprehensive unit tests covering generic/descriptive names, mixed cases, and edge cases, all of which are passing.\n</info added on 2025-08-04T11:07:46.959Z>",
+            "status": "done",
+            "testStrategy": "Test with code that heavily uses generic names ('data', 'temp_var') and code that uses descriptive, domain-specific names. Assert the returned percentage is within an expected range for each case."
+          },
+          {
+            "id": 3,
+            "title": "Implement Code Structure Analysis using AST",
+            "description": "Use Python's Abstract Syntax Tree (AST) module to analyze the structural consistency of the code, looking for overly uniform or simplistic structures often produced by AI.",
+            "dependencies": [],
+            "details": "In `engine.py`, create a function `analyze_code_structure(code_string)`. Use the `ast` module to parse the code. Traverse the tree to analyze metrics like function length, nesting depth, and the variety of node types used. The goal is to identify unnaturally consistent or simple structures.\n<info added on 2025-08-04T11:31:21.086Z>\nImplementation is complete and has been successfully tested. The `analyze_code_structure()` function was created in `shadow_ai/engine.py`. It uses AST parsing to analyze several key metrics: function length variance, average and maximum nesting depth, node type diversity, and control flow complexity. These are combined into a final 'structural uniformity score' from 0-100 to quantify suspicion.\n\nHelper functions `_calculate_max_nesting_depth()` and `_calculate_uniformity_score()` were also implemented. The feature is supported by 9 comprehensive test cases covering uniform/varied code, simple/complex patterns, and edge cases like syntax errors or empty input. All tests are passing. The function is robust, handles malformed code, and returns a detailed dictionary of metrics to be used by the confidence scoring module.\n</info added on 2025-08-04T11:31:21.086Z>",
+            "status": "done",
+            "testStrategy": "Provide code snippets with very simple, repetitive function structures and compare against more complex, varied human-written code. Ensure the function handles syntax errors gracefully by returning a neutral result."
+          },
+          {
+            "id": 4,
+            "title": "Implement AI Language Pattern Matching in Comments",
+            "description": "Develop a function to scan comments and docstrings for specific phrases and conversational artifacts commonly left by AI code generators.",
+            "dependencies": [],
+            "details": "In `engine.py`, create a function `match_ai_language_patterns(code_string)`. Define a list of tell-tale AI phrases (e.g., 'As an AI language model', 'I cannot access real-time data', 'Here is an example'). Use case-insensitive regex to search for these patterns within comments and docstrings.\n<info added on 2025-08-04T11:45:30.350Z>\nImplementation is complete and has been comprehensively tested.\n\n**Key Features & Details:**\n- **Pattern Categories:** Expanded detection to cover 4 distinct categories: AI Self-References, Conversational Patterns, Disclaimer Patterns, and Example/Template Patterns.\n- **Confidence Scoring:** A helper function, `_calculate_ai_language_confidence()`, was created to calculate a confidence score (0-100) based on the density and variety of patterns found.\n- **Robust Extraction:** A helper function, `_extract_comments_and_docstrings()`, uses both line parsing and AST analysis for more accurate extraction.\n- **Testing:** A suite of 9 comprehensive test cases was created, covering all pattern types, human code, mixed content, and edge cases (e.g., empty input, no comments). All tests are passing.\n</info added on 2025-08-04T11:45:30.350Z>",
+            "status": "done",
+            "testStrategy": "Unit test with code containing known AI conversational phrases in various casings and code without them. Assert that the function correctly identifies the presence of these phrases."
+          },
+          {
+            "id": 5,
+            "title": "Integrate Heuristics in a Main Engine Orchestrator",
+            "description": "Create a primary `analyze` function within the `engine.py` module that orchestrates the execution of all individual heuristic checks and aggregates their raw results into a single dictionary.",
+            "dependencies": [
+              "2.1",
+              "2.2",
+              "2.3",
+              "2.4"
+            ],
+            "details": "In `engine.py`, define a main function `analyze(code_string)`. This function will call the four heuristic functions (`analyze_comment_patterns`, `analyze_variable_names`, etc.). It will aggregate the raw outputs into a structured dictionary, for example: `{'comment_patterns': {...}, 'variable_names': {...}}`. This dictionary will serve as the raw data for the confidence scoring logic (Task 8).\n<info added on 2025-08-04T12:03:41.596Z>\nThe `analyze()` function has been implemented as the main entry point, orchestrating all four heuristic functions. The implementation includes robust error handling for each heuristic to prevent a single failure from stopping the entire analysis. The final output is a structured dictionary containing the results from each heuristic, plus additional `summary` (with high-level statistics and a preliminary risk score) and `analysis_metadata` (timestamp, code length, errors) sections. A comprehensive suite of 8 integration tests was created and is passing, covering various code types and edge cases.\n</info added on 2025-08-04T12:03:41.596Z>",
+            "status": "done",
+            "testStrategy": "Create an integration test that passes a sample code snippet to the main `analyze` function. Mock the individual heuristic functions to return predictable results and assert that the final aggregated dictionary is structured correctly."
+          }
+        ]
       },
       {
         "id": 3,
@@ -81,8 +132,63 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Core File and String Reader with Encoding Detection",
+            "description": "Create the foundational function in `parser.py` that reads content from a single file path or a raw string. This function must robustly handle different text encodings to prevent errors and ensure accurate content retrieval.",
+            "dependencies": [],
+            "details": "Implement a function `read_source(source: Union[str, Path]) -> Tuple[str, str]`. It will use `pathlib.Path` to check if the source is a file. If it is, read the file's content, attempting to decode with UTF-8 first and falling back to a common encoding like 'latin-1' upon `UnicodeDecodeError`. If the source is not a file path, treat it as raw string input. The function should return the content and a source identifier (filepath or 'raw_string').\n<info added on 2025-08-04T12:35:48.444Z>\nThe core `read_source_with_language` function from the previous subtask now successfully reads content from files and raw strings, handles basic encoding issues (UTF-8/Latin-1 fallback), and identifies the source language. It also includes foundational error handling for file access and encoding problems.\n\nThis subtask will build a more robust validation layer on top of this foundation to handle a wider range of invalid inputs and edge cases gracefully. The goal is to prevent downstream errors and provide clear feedback to the user.\n\n**Implementation Plan:**\n- Add an explicit check to reject directory paths passed as input, raising a specific `IsADirectoryError` or a custom exception.\n- Implement a file size limit (e.g., 5MB, configurable) to avoid processing excessively large files. Raise an error if a file exceeds this limit.\n- Enhance file permission error handling to catch `PermissionError` and return a user-friendly message.\n- Validate that input strings are not excessively long or empty, establishing sensible constraints for raw text analysis.\n</info added on 2025-08-04T12:35:48.444Z>",
+            "status": "done",
+            "testStrategy": "Test with a file path containing UTF-8 characters. Test with a raw string input. Test with a file saved in a non-UTF-8 encoding (e.g., Latin-1) to ensure it is read correctly. Test with an empty file."
+          },
+          {
+            "id": 2,
+            "title": "Develop Input Validation and Error Handling Logic",
+            "description": "Enhance the parser with robust validation to handle invalid inputs gracefully. This includes checking for path existence, file permissions, and file size limits to ensure the module is resilient.",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "Augment the `read_source` function to perform checks before reading. Use `pathlib.Path.exists()`, `pathlib.Path.is_file()`, and `os.access()` for read permissions. Implement a check to ensure file size does not exceed a 5MB limit. Raise specific, clear exceptions for each failure case (e.g., `FileNotFoundError`, `PermissionError`, `FileTooLargeError`).\n<info added on 2025-08-04T12:53:06.385Z>\n**Implementation Summary:**\n- A custom exception hierarchy was created (`ParserError`, `FileTooLargeError`, `InvalidInputError`) for more specific error handling.\n- Comprehensive validation was added for file inputs, checking for existence, permissions, file type, and the 5MB size limit.\n- New validation logic was implemented for string inputs, including a 1M character limit and null byte detection.\n- The system now correctly identifies and rejects directory paths, raising `IsADirectoryError`.\n- The `read_source` function was enhanced to integrate all validation checks and propagate errors correctly.\n- **Testing:** The implementation is fully tested, with 38/38 passing tests and 94% code coverage for the `parser.py` module.\n</info added on 2025-08-04T12:53:06.385Z>",
+            "status": "done",
+            "testStrategy": "Provide a path to a non-existent file and assert `FileNotFoundError`. Test with a file that lacks read permissions. Test with a file larger than 5MB to verify that `FileTooLargeError` is raised. Test with a directory path to ensure it's identified as an invalid input for this specific function."
+          },
+          {
+            "id": 3,
+            "title": "Implement Language Identification via File Extension",
+            "description": "Add a mechanism to identify the programming language of a file based on its extension. This provides metadata for the detection engine and allows for future language-specific parsing.",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "Create a class or dictionary that maps common code file extensions (e.g., '.py', '.js', '.java', '.cpp', '.go', '.rs') to language names ('Python', 'JavaScript', etc.). Modify the `read_source` function to use `pathlib.Path.suffix` to look up the language. It should return the content, language, and source path. For raw strings or unknown extensions, default the language to 'plaintext'.",
+            "status": "done",
+            "testStrategy": "Test with various file paths like 'app.py', 'server.go', and 'component.js' to assert the correct language is returned. Test with a file having an unmapped extension (e.g., 'notes.txt') to ensure it defaults to 'plaintext'. Verify that raw string input also results in 'plaintext'."
+          },
+          {
+            "id": 4,
+            "title": "Implement Batch Processing for Directories",
+            "description": "Develop the functionality to process multiple files from a directory. The function should scan a given directory, filter for relevant source code files, and process a limited number of them.",
+            "dependencies": [
+              "3.2",
+              "3.3"
+            ],
+            "details": "Create a new function `parse_directory(dir_path: Union[str, Path])`. This function will use `pathlib.Path.iterdir()` to scan the directory. It will use the language extension map (from subtask 3.3) to identify valid code files. It will then call the validated `read_source` function (from subtask 3.2) for each valid file, up to a maximum of 5 files. It should return a list of results, where each result contains the content, language, and file path.",
+            "status": "in-progress",
+            "testStrategy": "Create a test directory with 7 code files and 2 non-code files. Call the function and verify that it processes exactly 5 code files. Test with a directory containing 3 code files and ensure all 3 are processed. Test with an empty directory to confirm it returns an empty list."
+          },
+          {
+            "id": 5,
+            "title": "Create Unified Parser Interface for Engine Integration",
+            "description": "Abstract the different input methods (single file, raw string, directory) into a single, high-level interface function. This provides a clean and consistent entry point for the detection engine.",
+            "dependencies": [
+              "3.4"
+            ],
+            "details": "Implement a primary `parse(source: Union[str, Path]) -> List[Dict]` function in `parser.py`. This function will determine the input type: if `pathlib.Path(source).is_dir()`, it calls `parse_directory`; if `pathlib.Path(source).is_file()`, it calls `read_source`; otherwise, it treats the input as a raw string. The function must always return a list of dictionaries, each containing `{'content': str, 'language': str, 'source': str}`, to provide a standardized output for the detection engine.",
+            "status": "pending",
+            "testStrategy": "Test the `parse` function by passing it a valid file path, a directory path, and a raw code string. In each case, assert that the output is a list of dictionaries with the expected structure and content. Verify that it correctly delegates to the appropriate internal function."
+          }
+        ]
       },
       {
         "id": 4,
@@ -214,7 +320,7 @@
     ],
     "metadata": {
       "created": "2025-08-04T09:46:46.647Z",
-      "updated": "2025-08-04T10:31:57.938Z",
+      "updated": "2025-08-04T12:56:57.578Z",
       "description": "Tasks for master context"
     }
   }
