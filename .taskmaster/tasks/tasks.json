@@ -25,8 +25,8 @@
             "title": "Set Up Conda Environment and pyproject.toml",
             "description": "Configure the project's isolated Python environment using Conda and initialize the `pyproject.toml` file for modern, PEP 621-compliant dependency management.",
             "dependencies": [],
-            "details": "Create a Conda environment for the project using Python 3.10+ (e.g., `conda create -n shadow-ai python=3.10`). Activate the environment. Manually create or use a tool like Poetry/PDM to initialize a `pyproject.toml` file. Define project metadata (name, version, authors) and add `pytest` as a development dependency.",
-            "status": "in-progress",
+            "details": "Create a Conda environment for the project using Python 3.10+ (e.g., `conda create -n shadow-ai python=3.10`). Activate the environment. Manually create or use a tool like Poetry/PDM to initialize a `pyproject.toml` file. Define project metadata (name, version, authors) and add `pytest` as a development dependency.\n<info added on 2025-08-04T10:11:05.386Z>\n**Implementation Notes:**\n- A `shadow-ai` conda environment was created with Python 3.11.13.\n- A comprehensive `pyproject.toml` was set up using modern PEP 621 standards, replacing the need for `setup.py` and `requirements.txt`.\n- Core dependencies were installed:\n  - **Production:** `fastapi`, `uvicorn[standard]`, `click`\n  - **Development:** `pytest`, `pytest-cov`, `ruff`, `mypy`, `httpx`\n- Initial configuration for `ruff` (for both linting and formatting) and `mypy` (for strict type checking) was added to `pyproject.toml`.\n- Environment setup documentation was created in `docs/environment.md`.\n- All installed tools were verified as operational (pytest 8.4.1, ruff 0.12.0, mypy 1.16.0).\n</info added on 2025-08-04T10:11:05.386Z>",
+            "status": "done",
             "testStrategy": "Activate the conda environment. Run `pip install .[dev]` or equivalent. Verify that `pytest` is installed and its version can be checked (`pytest --version`)."
           },
           {
@@ -35,7 +35,7 @@
             "description": "Integrate and configure modern code quality tools within `pyproject.toml` to enforce a consistent coding style and catch common errors automatically.",
             "dependencies": [],
             "details": "Add `ruff` and `mypy` as development dependencies in `pyproject.toml`. Create configuration sections for these tools (e.g., `[tool.ruff]`, `[tool.mypy]`). Configure `ruff` to enforce Black-compatible formatting and a strict set of linting rules suitable for a new project. Configure `mypy` for strict type checking.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "After installing dependencies, run `ruff check .`, `ruff format --check .`, and `mypy shadow_ai` from the command line. Verify they run without configuration errors."
           },
           {
@@ -214,7 +214,7 @@
     ],
     "metadata": {
       "created": "2025-08-04T09:46:46.647Z",
-      "updated": "2025-08-04T10:01:50.960Z",
+      "updated": "2025-08-04T10:11:21.241Z",
       "description": "Tasks for master context"
     }
   }
