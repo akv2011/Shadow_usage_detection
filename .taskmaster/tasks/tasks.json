@@ -34,8 +34,8 @@
             "title": "Configure Code Linters and Formatters",
             "description": "Integrate and configure modern code quality tools within `pyproject.toml` to enforce a consistent coding style and catch common errors automatically.",
             "dependencies": [],
-            "details": "Add `ruff` and `mypy` as development dependencies in `pyproject.toml`. Create configuration sections for these tools (e.g., `[tool.ruff]`, `[tool.mypy]`). Configure `ruff` to enforce Black-compatible formatting and a strict set of linting rules suitable for a new project. Configure `mypy` for strict type checking.",
-            "status": "in-progress",
+            "details": "Add `ruff` and `mypy` as development dependencies in `pyproject.toml`. Create configuration sections for these tools (e.g., `[tool.ruff]`, `[tool.mypy]`). Configure `ruff` to enforce Black-compatible formatting and a strict set of linting rules suitable for a new project. Configure `mypy` for strict type checking.\n<info added on 2025-08-04T10:17:58.387Z>\nConfiguration for `ruff` and `mypy` was successfully added to `pyproject.toml`.\n- **Ruff**: Configured for Black-compatible formatting (88-char line length) and a strict linting ruleset (E, F, I, W, B, C4, UP).\n- **Mypy**: Configured for strict type checking.\n\nA `.pre-commit-config.yaml` file was created to automate these checks on commit, including hooks for `ruff` (lint & format), `mypy`, and standard file cleanup.\n\nFor improved developer workflow on Windows, helper scripts were created:\n- `dev.bat`: A batch file providing simple access to commands (`lint`, `format`, `types`, `test`, `all`, `clean`).\n- `scripts/dev.ps1`: A PowerShell module with underlying helper functions.\n\nVerification was performed by running `ruff check`, `ruff format --check`, and `mypy .`, all of which passed successfully.\n</info added on 2025-08-04T10:17:58.387Z>",
+            "status": "done",
             "testStrategy": "After installing dependencies, run `ruff check .`, `ruff format --check .`, and `mypy shadow_ai` from the command line. Verify they run without configuration errors."
           },
           {
@@ -44,7 +44,7 @@
             "description": "Establish the initial test suite by creating a simple placeholder test case. This ensures the testing framework is correctly configured and provides a target for the CI pipeline.",
             "dependencies": [],
             "details": "In the `/tests` directory, create a file named `test_initial_setup.py`. Inside this file, write a simple passing test function, such as `def test_project_initialization(): assert True`, to confirm that `pytest` can discover and execute tests.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Run `pytest` from the project's root directory. Verify that it discovers and runs the single test, reporting 1 passed test."
           },
           {
@@ -214,7 +214,7 @@
     ],
     "metadata": {
       "created": "2025-08-04T09:46:46.647Z",
-      "updated": "2025-08-04T10:11:21.241Z",
+      "updated": "2025-08-04T10:18:52.333Z",
       "description": "Tasks for master context"
     }
   }
