@@ -1,0 +1,221 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Initialize Project Structure and CI/CD Pipeline",
+        "description": "Set up the foundational project structure, including the Git repository, Python environment, and basic dependency management. This task ensures a clean and scalable starting point for all subsequent development.",
+        "details": "Create a new Git repository. Set up a Python 3.8+ virtual environment. Initialize a `requirements.txt` or `pyproject.toml` with core libraries like `pytest`. Create directory structure: `/shadow_ai` for source code, `/tests` for unit tests, and a `/docs` folder. Configure a basic CI pipeline (e.g., GitHub Actions) to run linters and tests on push.",
+        "testStrategy": "Verify that the repository is cloneable, the virtual environment can be created, dependencies can be installed via `pip install`, and `pytest` runs successfully (even with no tests). The CI pipeline should trigger and pass on the initial commit.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize Git Repository and Directory Structure",
+            "description": "Create the project's Git repository on GitHub and establish the standard directory layout for source code, tests, and documentation, including a Python-specific .gitignore file.",
+            "dependencies": [],
+            "details": "Create a new public repository on GitHub named 'shadow-ai'. Clone it locally. Create the following directories: `shadow_ai/`, `tests/`, and `docs/`. Add a placeholder `__init__.py` to `shadow_ai/` and `tests/` to make them recognizable as Python packages. Generate and commit a standard Python `.gitignore` file.",
+            "status": "in-progress",
+            "testStrategy": "Verify the repository is cloneable from GitHub. Check that the `shadow_ai`, `tests`, `docs`, and `.gitignore` files/folders exist in the cloned repository."
+          },
+          {
+            "id": 2,
+            "title": "Set Up Conda Environment and pyproject.toml",
+            "description": "Configure the project's isolated Python environment using Conda and initialize the `pyproject.toml` file for modern, PEP 621-compliant dependency management.",
+            "dependencies": [],
+            "details": "Create a Conda environment for the project using Python 3.10+ (e.g., `conda create -n shadow-ai python=3.10`). Activate the environment. Manually create or use a tool like Poetry/PDM to initialize a `pyproject.toml` file. Define project metadata (name, version, authors) and add `pytest` as a development dependency.",
+            "status": "pending",
+            "testStrategy": "Activate the conda environment. Run `pip install .[dev]` or equivalent. Verify that `pytest` is installed and its version can be checked (`pytest --version`)."
+          },
+          {
+            "id": 3,
+            "title": "Configure Code Linters and Formatters",
+            "description": "Integrate and configure modern code quality tools within `pyproject.toml` to enforce a consistent coding style and catch common errors automatically.",
+            "dependencies": [],
+            "details": "Add `ruff` and `mypy` as development dependencies in `pyproject.toml`. Create configuration sections for these tools (e.g., `[tool.ruff]`, `[tool.mypy]`). Configure `ruff` to enforce Black-compatible formatting and a strict set of linting rules suitable for a new project. Configure `mypy` for strict type checking.",
+            "status": "pending",
+            "testStrategy": "After installing dependencies, run `ruff check .`, `ruff format --check .`, and `mypy shadow_ai` from the command line. Verify they run without configuration errors."
+          },
+          {
+            "id": 4,
+            "title": "Create Initial Test Suite Placeholder",
+            "description": "Establish the initial test suite by creating a simple placeholder test case. This ensures the testing framework is correctly configured and provides a target for the CI pipeline.",
+            "dependencies": [],
+            "details": "In the `/tests` directory, create a file named `test_initial_setup.py`. Inside this file, write a simple passing test function, such as `def test_project_initialization(): assert True`, to confirm that `pytest` can discover and execute tests.",
+            "status": "pending",
+            "testStrategy": "Run `pytest` from the project's root directory. Verify that it discovers and runs the single test, reporting 1 passed test."
+          },
+          {
+            "id": 5,
+            "title": "Implement Basic GitHub Actions CI Workflow",
+            "description": "Create a continuous integration workflow using GitHub Actions that automatically validates code quality and runs tests on every push and pull request.",
+            "dependencies": [],
+            "details": "Create a `.github/workflows/ci.yml` file. Define a workflow that triggers on `push` and `pull_request` to the main branch. The workflow should contain a single job with steps to: 1) Checkout code. 2) Set up Python 3.10. 3) Install project dependencies. 4) Run linter/formatter checks (`ruff check .` and `ruff format --check .`). 5) Run the test suite (`pytest`).",
+            "status": "pending",
+            "testStrategy": "Push the initial project structure to the GitHub repository. Navigate to the 'Actions' tab on GitHub and verify that the CI workflow is triggered and passes successfully."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Develop Core Heuristic Detection Engine",
+        "description": "Implement the primary AI detection logic based on the specified heuristic checks. This module will be the brain of the tool, responsible for analyzing code snippets and identifying patterns indicative of AI generation.",
+        "details": "Create a Python module `engine.py`. Implement functions for: 1) Comment Pattern Analysis (regex for repetitive structures). 2) Variable Naming Analysis (check against a list of generic names like 'data', 'result', 'temp'). 3) Code Structure Analysis (use an AST parser like Python's `ast` module to check for overly consistent node structures). 4) AI Language Pattern matching in comments.",
+        "testStrategy": "Create a suite of unit tests in `/tests` with sample code snippets. Include positive cases (known AI-generated code) and negative cases (known human-written code). Assert that specific heuristics are correctly triggered for each case.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Implement Multi-Language File Parser",
+        "description": "Build a module to handle various input methods, including single file uploads, raw text input, and batch file processing. This component will abstract the input source and provide clean code text to the detection engine.",
+        "details": "Create a `parser.py` module. Implement a function that accepts a file path or a string. Use file extensions (`.py`, `.js`, `.java`, etc.) to identify the language. For now, treat all as plain text, but structure for future language-specific parsing. Implement logic to handle reading up to 5 files from a directory for batch analysis.",
+        "testStrategy": "Test with various file types (.py, .js, .java, .cpp, .go, .rs) to ensure they are read correctly. Test the text input functionality. Test batch processing by providing a directory path and verifying all files are processed. Test edge cases like empty files or files > 5MB.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Build CLI Interface",
+        "description": "Create a command-line interface (CLI) for the tool, allowing users to run analysis directly from their terminal. This provides a fast and scriptable way to use the detection engine.",
+        "details": "Use Python's `argparse` or a more modern library like `click`. Implement the specified commands: `shadow-detect analyze <file>`, `shadow-detect check --text \"...\"`, and `shadow-detect scan <directory> --recursive`. Structure the CLI to call the appropriate functions from the parser and engine modules.",
+        "testStrategy": "Run each command from the terminal with valid and invalid arguments. Verify that `analyze` works with a single file, `check` with a string, and `scan` with a directory. Check that help messages (`-h` or `--help`) are displayed correctly.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Integrate Engine with CLI and Format Output",
+        "description": "Connect the detection engine to the CLI and format the analysis results into a user-friendly text output, including the final verdict, confidence score, and reasons.",
+        "details": "In the CLI module, after parsing and analysis, call a formatting function. This function will take the raw results from the engine (e.g., a dictionary of triggered heuristics) and generate the final output string: 'Result: Likely AI-Generated', 'Confidence: 75%', 'Reason: ...', 'Patterns Found: [Generic variable names, Repetitive comments]'.",
+        "testStrategy": "Run the CLI tool on test files. Verify that the output matches the expected format. Check that the confidence score and reasons are plausible based on the input code. This is an integration test.",
+        "priority": "high",
+        "dependencies": [
+          2,
+          3,
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Develop Backend API for Web Interface",
+        "description": "Set up a lightweight web server using FastAPI or Flask to expose the detection engine's functionality via API endpoints. This will serve as the backend for the web UI.",
+        "details": "Use FastAPI for its performance and automatic docs. Create a `main.py` for the web server. Define two endpoints: one for text input (`/api/check`) that accepts a JSON payload with code, and one for file upload (`/api/analyze`) that accepts a file. These endpoints will use the engine and return results as JSON.",
+        "testStrategy": "Run the web server locally. Use a tool like `curl` or Postman to send requests to the `/api/check` and `/api/analyze` endpoints. Verify that they return a 200 status code and a valid JSON response containing the analysis results.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Create Simple Web Frontend",
+        "description": "Build a minimal HTML/CSS/JavaScript frontend for users to interact with the tool through a web browser. The interface will support pasting code and uploading files.",
+        "details": "Create a `/static` directory for the frontend files. Write a single `index.html` file with a text area for code input and a drag-and-drop file upload zone. Use vanilla JavaScript to handle form submission, sending the data to the backend API using `fetch()`. On response, dynamically display the results (verdict, confidence, explanation) on the page.",
+        "testStrategy": "Open the `index.html` in a browser. Test pasting code and clicking 'Analyze'. Test dragging and dropping a file. Verify that the results from the backend are displayed correctly and clearly on the page. Check for basic responsiveness.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Confidence Scoring Logic",
+        "description": "Develop the algorithm to convert the raw heuristic detection results into a quantitative confidence score (0-100%) and a qualitative risk level (Low, Medium, High).",
+        "details": "In the detection engine, create a scoring module. Assign a weight to each heuristic. The final score will be a weighted sum of the triggered heuristics, normalized to a 0-100 scale. Define thresholds for risk levels (e.g., 0-40% Low, 41-75% Medium, 76-100% High). The score should be part of the engine's output.",
+        "testStrategy": "Create unit tests that provide mock heuristic results to the scoring function. Assert that a file with many triggered heuristics gets a high score, and a file with few gets a low score. Verify that the risk levels correspond correctly to the score thresholds.",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Develop Interactive AI Pattern Quiz",
+        "description": "Create the 'Interactive AI Pattern Quiz' feature to educate users. This involves creating a set of quiz questions and a simple UI to present them.",
+        "details": "Create a JSON file with 10 quiz questions, each containing a code snippet, the correct answer ('AI' or 'Human'), and the tool's reasoning. Create a new API endpoint (`/api/quiz`) in the backend to serve these questions. On the frontend, create a `quiz.html` page that fetches the questions, allows the user to guess, and then shows the correct answer and explanation.",
+        "testStrategy": "Manually take the quiz to ensure the flow is correct. Verify that questions are loaded from the backend. Check that user answers are recorded and the correct results and explanations are shown. Ensure the user's score is tracked correctly.",
+        "priority": "medium",
+        "dependencies": [
+          6,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implement Code Style Inconsistency Detector",
+        "description": "Add an advanced detection feature to identify when coding style (e.g., indentation, spacing, naming conventions) changes within a single file, which can indicate AI-injected code.",
+        "details": "Extend the engine's AST analysis. For each function or class node, compute a style 'fingerprint' (e.g., a hash based on indentation type, variable name style, comment density). Compare these fingerprints across different nodes in the file. If a significant deviation is found, flag it as a 'Style Inconsistency' pattern.",
+        "testStrategy": "Create test files where one function is written in a different style (e.g., tabs vs. spaces, different variable casing). Run the detector and assert that it correctly flags the inconsistent function. Test with a consistently styled file to ensure no false positives.",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Set Up SQLite Database and History Dashboard",
+        "description": "Implement a simple persistence layer using SQLite to store analysis history. Create a basic dashboard page to display past results and simple statistics.",
+        "details": "Use Python's built-in `sqlite3` module. Create a database schema with a 'history' table (id, filename, timestamp, result, score). Modify the backend API to log every analysis to this table. Create a new `/dashboard` page and a corresponding API endpoint (`/api/history`) that retrieves all records. Display the history in a simple HTML table on the dashboard page.",
+        "testStrategy": "Perform several analyses via the web UI. Navigate to the dashboard page and verify that all analyses are listed correctly. Check the database file directly to ensure data is being written as expected. Restart the server and confirm the history persists.",
+        "priority": "low",
+        "dependencies": [
+          6,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Finalize Documentation and Test Suite",
+        "description": "Create comprehensive user documentation and a robust test suite to ensure the tool is reliable, easy to use, and maintainable.",
+        "details": "Write a detailed `README.md` file covering: project overview, installation instructions (for both CLI and web), usage examples for all CLI commands, and an explanation of the output format. Expand the test suite in `/tests` to have at least 80% code coverage, including integration tests for the CLI and API.",
+        "testStrategy": "Ask a new user to follow the `README.md` to install and run the tool. Their ability to do so without assistance is the primary test. Run a code coverage tool (e.g., `pytest-cov`) to verify test coverage meets the target. All tests must pass.",
+        "priority": "high",
+        "dependencies": [
+          5,
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-04T09:46:46.647Z",
+      "updated": "2025-08-04T09:52:32.290Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
