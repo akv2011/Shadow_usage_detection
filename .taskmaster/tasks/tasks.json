@@ -16,8 +16,8 @@
             "title": "Initialize Git Repository and Directory Structure",
             "description": "Create the project's Git repository on GitHub and establish the standard directory layout for source code, tests, and documentation, including a Python-specific .gitignore file.",
             "dependencies": [],
-            "details": "Create a new public repository on GitHub named 'shadow-ai'. Clone it locally. Create the following directories: `shadow_ai/`, `tests/`, and `docs/`. Add a placeholder `__init__.py` to `shadow_ai/` and `tests/` to make them recognizable as Python packages. Generate and commit a standard Python `.gitignore` file.",
-            "status": "in-progress",
+            "details": "Create a new public repository on GitHub named 'shadow-ai'. Clone it locally. Create the following directories: `shadow_ai/`, `tests/`, and `docs/`. Add a placeholder `__init__.py` to `shadow_ai/` and `tests/` to make them recognizable as Python packages. Generate and commit a standard Python `.gitignore` file.\n<info added on 2025-08-04T09:55:54.604Z>\n**Completion Summary (Commit: 570ca7f):**\n- The repository and directory structure were successfully created.\n- The main package directory was named `shadow_ai/` (instead of `src/`) for better descriptiveness.\n- `__init__.py` files were added to `shadow_ai/` and `tests/`. The main `__init__.py` was populated with project metadata (`__version__`, `__author__`, `__email__`).\n- A comprehensive `.gitignore` file was generated, covering Python-specific artifacts, virtual environments, IDE files, and testing caches.\n- All changes were committed, marking the completion of the initial setup.\n</info added on 2025-08-04T09:55:54.604Z>",
+            "status": "done",
             "testStrategy": "Verify the repository is cloneable from GitHub. Check that the `shadow_ai`, `tests`, `docs`, and `.gitignore` files/folders exist in the cloned repository."
           },
           {
@@ -26,7 +26,7 @@
             "description": "Configure the project's isolated Python environment using Conda and initialize the `pyproject.toml` file for modern, PEP 621-compliant dependency management.",
             "dependencies": [],
             "details": "Create a Conda environment for the project using Python 3.10+ (e.g., `conda create -n shadow-ai python=3.10`). Activate the environment. Manually create or use a tool like Poetry/PDM to initialize a `pyproject.toml` file. Define project metadata (name, version, authors) and add `pytest` as a development dependency.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Activate the conda environment. Run `pip install .[dev]` or equivalent. Verify that `pytest` is installed and its version can be checked (`pytest --version`)."
           },
           {
@@ -214,7 +214,7 @@
     ],
     "metadata": {
       "created": "2025-08-04T09:46:46.647Z",
-      "updated": "2025-08-04T09:52:32.290Z",
+      "updated": "2025-08-04T10:01:50.960Z",
       "description": "Tasks for master context"
     }
   }
