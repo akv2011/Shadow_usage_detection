@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Create Simple Web Frontend
+# Status: pending
+# Dependencies: 6
+# Priority: medium
+# Description: Build a minimal HTML/CSS/JavaScript frontend for users to interact with the tool through a web browser. The interface will support pasting code and uploading files.
+# Details:
+Create a `/static` directory for the frontend files. Write a single `index.html` file with a text area for code input and a drag-and-drop file upload zone. Use vanilla JavaScript to handle form submission, sending the data to the backend API using `fetch()`. On response, dynamically display the results (verdict, confidence, explanation) on the page.
+
+# Test Strategy:
+Open the `index.html` in a browser. Test pasting code and clicking 'Analyze'. Test dragging and dropping a file. Verify that the results from the backend are displayed correctly and clearly on the page. Check for basic responsiveness.

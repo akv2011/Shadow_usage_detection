@@ -39,7 +39,7 @@ dev = [
 ]
 
 [project.scripts]
-shadow-ai = "shadow_ai.cli:main"
+shadow-detect = "shadow_ai.cli:main"
 
 [project.urls]
 "Homepage" = "https://github.com/akv2011/Shadow_usage_detection"

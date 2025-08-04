@@ -1,0 +1,11 @@
+# Task ID: 9
+# Title: Develop Interactive AI Pattern Quiz
+# Status: pending
+# Dependencies: 6, 7
+# Priority: medium
+# Description: Create the 'Interactive AI Pattern Quiz' feature to educate users. This involves creating a set of quiz questions and a simple UI to present them.
+# Details:
+Create a JSON file with 10 quiz questions, each containing a code snippet, the correct answer ('AI' or 'Human'), and the tool's reasoning. Create a new API endpoint (`/api/quiz`) in the backend to serve these questions. On the frontend, create a `quiz.html` page that fetches the questions, allows the user to guess, and then shows the correct answer and explanation.
+
+# Test Strategy:
+Manually take the quiz to ensure the flow is correct. Verify that questions are loaded from the backend. Check that user answers are recorded and the correct results and explanations are shown. Ensure the user's score is tracked correctly.

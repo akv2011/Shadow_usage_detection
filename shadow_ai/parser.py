@@ -272,3 +272,309 @@ def read_source_with_language(source: Union[str, Path]) -> Tuple[str, str, str]:
         language = LanguageMapper.get_language(source_identifier)
     
     return content, language, source_identifier
+
+
+def parse_directory(dir_path: Union[str, Path], max_files: int = 5) -> List[Dict[str, str]]:
+    """
+    Parse multiple files from a directory for batch analysis.
+    
+    Scans the given directory for source code files and processes up to max_files
+    of them. Files are selected based on recognized code file extensions and
+    processed in alphabetical order for consistency.
+    
+    Args:
+        dir_path: Path to the directory to scan
+        max_files: Maximum number of files to process (default: 5)
+        
+    Returns:
+        List of dictionaries, each containing:
+        - 'content': The file content as string
+        - 'language': Programming language name  
+        - 'source': File path
+        
+    Raises:
+        FileNotFoundError: If the directory doesn't exist
+        NotADirectoryError: If the path is not a directory
+        PermissionError: If the directory cannot be accessed
+        InvalidInputError: If max_files is invalid
+    """
+    if max_files <= 0:
+        raise InvalidInputError(f"max_files must be positive, got {max_files}")
+    
+    directory = Path(dir_path)
+    
+    # Validate directory
+    if not directory.exists():
+        raise FileNotFoundError(f"Directory not found: {directory}")
+    
+    if not directory.is_dir():
+        raise NotADirectoryError(f"Path is not a directory: {directory}")
+    
+    # Check directory permissions
+    if not os.access(directory, os.R_OK):
+        raise PermissionError(f"Directory cannot be read (permission denied): {directory}")
+    
+    results = []
+    processed_count = 0
+    
+    try:
+        # Get all files and sort them for consistent ordering
+        all_files = sorted([f for f in directory.iterdir() if f.is_file()])
+        
+        for file_path in all_files:
+            # Stop if we've reached the maximum number of files
+            if processed_count >= max_files:
+                break
+            
+            # Check if it's a recognized code file
+            if LanguageMapper.is_code_file(file_path):
+                try:
+                    content, language, source = read_source_with_language(file_path)
+                    results.append({
+                        'content': content,
+                        'language': language,
+                        'source': source
+                    })
+                    processed_count += 1
+                except (UnicodeDecodeError, FileTooLargeError, PermissionError) as e:
+                    # Skip files that can't be processed, but continue with others
+                    # In a production environment, you might want to log these errors
+                    continue
+    
+    except PermissionError:
+        # Re-raise directory permission errors
+        raise PermissionError(f"Cannot list directory contents: {directory}")
+    
+    return results
+
+
+def get_directory_stats(dir_path: Union[str, Path]) -> Dict[str, int]:
+    """
+    Get statistics about code files in a directory.
+    
+    Args:
+        dir_path: Path to the directory to analyze
+        
+    Returns:
+        Dictionary with statistics:
+        - 'total_files': Total number of files
+        - 'code_files': Number of recognized code files
+        - 'languages': Dictionary mapping language names to file counts
+        
+    Raises:
+        FileNotFoundError: If the directory doesn't exist
+        NotADirectoryError: If the path is not a directory
+        PermissionError: If the directory cannot be accessed
+    """
+    directory = Path(dir_path)
+    
+    # Validate directory
+    if not directory.exists():
+        raise FileNotFoundError(f"Directory not found: {directory}")
+    
+    if not directory.is_dir():
+        raise NotADirectoryError(f"Path is not a directory: {directory}")
+    
+    if not os.access(directory, os.R_OK):
+        raise PermissionError(f"Directory cannot be read: {directory}")
+    
+    stats = {
+        'total_files': 0,
+        'code_files': 0,
+        'languages': {}
+    }
+    
+    try:
+        for file_path in directory.iterdir():
+            if file_path.is_file():
+                stats['total_files'] += 1
+                
+                if LanguageMapper.is_code_file(file_path):
+                    stats['code_files'] += 1
+                    language = LanguageMapper.get_language(file_path)
+                    stats['languages'][language] = stats['languages'].get(language, 0) + 1
+    
+    except PermissionError:
+        raise PermissionError(f"Cannot list directory contents: {directory}")
+    
+    return stats
+
+
+def parse(source: Union[str, Path], max_files: int = 5) -> List[Dict[str, str]]:
+    """
+    Unified parser interface for all input types.
+    
+    This is the main entry point for the parser module. It automatically detects
+    the input type (file, directory, or raw string) and processes it accordingly,
+    always returning a consistent list format for the detection engine.
+    
+    Args:
+        source: Input source - can be:
+            - File path (str/Path): Single file to process
+            - Directory path (str/Path): Directory to batch process  
+            - Raw string: Code content to analyze directly
+        max_files: Maximum files to process for directories (default: 5)
+        
+    Returns:
+        List of dictionaries, each containing:
+        - 'content': The code content as string
+        - 'language': Programming language name
+        - 'source': Source identifier (file path or 'raw_string')
+        - 'metadata': Additional metadata dictionary
+        
+    Raises:
+        All exceptions from underlying functions (validation, file access, etc.)
+        
+    Examples:
+        # Single file
+        results = parse('app.py')
+        
+        # Directory batch processing
+        results = parse('./src', max_files=10)
+        
+        # Raw code string
+        results = parse('def hello(): print("world")')
+    """
+    # Handle empty string case before Path creation (empty string resolves to current directory)
+    if isinstance(source, str) and len(source) == 0:
+        # This will raise InvalidInputError for empty strings
+        content, language, source_id = read_source_with_language(source)
+        return [{
+            'content': content,
+            'language': language,
+            'source': source_id,
+            'metadata': {
+                'input_type': 'raw_string',
+                'content_length': len(content),
+                'estimated_lines': content.count('\n') + 1 if content else 0
+            }
+        }]
+    
+    source_path = Path(source)
+    
+    # Detect input type and route to appropriate function
+    if source_path.exists():
+        if source_path.is_file():
+            # Single file processing
+            content, language, source_id = read_source_with_language(source_path)
+            return [{
+                'content': content,
+                'language': language,
+                'source': source_id,
+                'metadata': {
+                    'input_type': 'file',
+                    'file_size': source_path.stat().st_size,
+                    'file_extension': source_path.suffix
+                }
+            }]
+        
+        elif source_path.is_dir():
+            # Directory batch processing
+            directory_results = parse_directory(source_path, max_files=max_files)
+            
+            # Add metadata to each result
+            for result in directory_results:
+                file_path = Path(result['source'])
+                result['metadata'] = {
+                    'input_type': 'directory_batch',
+                    'file_size': file_path.stat().st_size,
+                    'file_extension': file_path.suffix,
+                    'directory': str(source_path)
+                }
+            
+            return directory_results
+        
+        else:
+            # Path exists but is neither file nor directory
+            raise InvalidInputError(f"Path exists but is not a file or directory: {source_path}")
+    
+    else:
+        # Path doesn't exist - treat as raw string
+        content, language, source_id = read_source_with_language(source)
+        return [{
+            'content': content,
+            'language': language,
+            'source': source_id,
+            'metadata': {
+                'input_type': 'raw_string',
+                'content_length': len(content),
+                'estimated_lines': content.count('\n') + 1 if content else 0
+            }
+        }]
+
+
+def parse_with_stats(source: Union[str, Path], max_files: int = 5) -> Dict[str, any]:
+    """
+    Parse with additional statistics and metadata.
+    
+    This enhanced version of parse() provides additional context about the
+    parsing operation, useful for debugging and user feedback.
+    
+    Args:
+        source: Input source (file, directory, or raw string)
+        max_files: Maximum files to process for directories
+        
+    Returns:
+        Dictionary containing:
+        - 'results': List of parsed results (same as parse())
+        - 'stats': Statistics about the parsing operation
+        - 'summary': Human-readable summary
+        
+    Raises:
+        All exceptions from parse()
+    """
+    import time
+    start_time = time.time()
+    
+    # Perform the parsing
+    results = parse(source, max_files=max_files)
+    
+    # Calculate statistics
+    end_time = time.time()
+    processing_time = end_time - start_time
+    
+    total_content_length = sum(len(result['content']) for result in results)
+    languages_found = set(result['language'] for result in results)
+    
+    # Determine input type for stats
+    source_path = Path(source)
+    if source_path.exists():
+        if source_path.is_file():
+            input_type = 'file'
+            source_info = str(source_path)
+        elif source_path.is_dir():
+            input_type = 'directory'
+            source_info = str(source_path)
+        else:
+            input_type = 'special_file'
+            source_info = str(source_path)
+    else:
+        input_type = 'raw_string'
+        source_info = f"string ({len(str(source))} chars)"
+    
+    stats = {
+        'input_type': input_type,
+        'source_info': source_info,
+        'files_processed': len(results),
+        'total_content_length': total_content_length,
+        'languages_found': sorted(list(languages_found)),
+        'processing_time_seconds': round(processing_time, 4),
+        'max_files_limit': max_files
+    }
+    
+    # Generate human-readable summary
+    if input_type == 'directory':
+        summary = f"Processed {len(results)} files from directory '{source}' in {processing_time:.3f}s"
+    elif input_type == 'file':
+        summary = f"Processed single file '{source}' ({total_content_length} characters) in {processing_time:.3f}s"
+    else:
+        summary = f"Processed raw string input ({total_content_length} characters) in {processing_time:.3f}s"
+    
+    if languages_found:
+        summary += f". Languages: {', '.join(sorted(languages_found))}"
+    
+    return {
+        'results': results,
+        'stats': stats,
+        'summary': summary
+    }

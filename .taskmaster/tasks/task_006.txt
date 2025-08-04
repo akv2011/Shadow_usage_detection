@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Develop Backend API for Web Interface
+# Status: pending
+# Dependencies: 2, 3
+# Priority: medium
+# Description: Set up a lightweight web server using FastAPI or Flask to expose the detection engine's functionality via API endpoints. This will serve as the backend for the web UI.
+# Details:
+Use FastAPI for its performance and automatic docs. Create a `main.py` for the web server. Define two endpoints: one for text input (`/api/check`) that accepts a JSON payload with code, and one for file upload (`/api/analyze`) that accepts a file. These endpoints will use the engine and return results as JSON.
+
+# Test Strategy:
+Run the web server locally. Use a tool like `curl` or Postman to send requests to the `/api/check` and `/api/analyze` endpoints. Verify that they return a 200 status code and a valid JSON response containing the analysis results.

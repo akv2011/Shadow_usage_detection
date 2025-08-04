@@ -1,0 +1,66 @@
+# Task ID: 2
+# Title: Develop Core Heuristic Detection Engine
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Implement the primary AI detection logic based on the specified heuristic checks. This module will be the brain of the tool, responsible for analyzing code snippets and identifying patterns indicative of AI generation.
+# Details:
+Create a Python module `engine.py`. Implement functions for: 1) Comment Pattern Analysis (regex for repetitive structures). 2) Variable Naming Analysis (check against a list of generic names like 'data', 'result', 'temp'). 3) Code Structure Analysis (use an AST parser like Python's `ast` module to check for overly consistent node structures). 4) AI Language Pattern matching in comments.
+
+# Test Strategy:
+Create a suite of unit tests in `/tests` with sample code snippets. Include positive cases (known AI-generated code) and negative cases (known human-written code). Assert that specific heuristics are correctly triggered for each case.
+
+# Subtasks:
+## 1. Implement Comment Pattern Analysis Heuristic [done]
+### Dependencies: None
+### Description: Develop the function to analyze comments in a code snippet for patterns indicative of AI generation, such as overly simplistic or repetitive comment structures.
+### Details:
+In `engine.py`, create a function `analyze_comment_patterns(code_string)`. Use regular expressions to identify common, non-descriptive comment formats (e.g., `# [Function Name]`, `# [Variable Name]`) and check for high comment-to-code ratios. The function should return a raw metric, such as the count of matched patterns.
+<info added on 2025-08-04T11:02:29.680Z>
+The `analyze_comment_patterns()` function has been implemented in `shadow_ai/engine.py`. It uses 14 regex patterns to detect generic AI-generated comments, calculates the comment-to-code ratio, and identifies repetitive comment structures via a helper function. The implementation is robust, handling edge cases like empty input. A comprehensive test suite in `tests/test_detection_engine.py` with 8 test cases was created, achieving 98% code coverage and validating functionality against various scenarios. The function returns a structured dictionary of metrics for integration with the confidence scoring module.
+</info added on 2025-08-04T11:02:29.680Z>
+
+## 2. Implement Variable Naming Analysis Heuristic [done]
+### Dependencies: None
+### Description: Create the logic to check for the use of overly generic variable and function names, which are common in AI-generated code examples.
+### Details:
+In `engine.py`, create a function `analyze_variable_names(code_string)`. Define a configurable list of common generic names (e.g., 'data', 'result', 'temp', 'item'). Use the `ast` module to parse the code, extract all variable and function names, and calculate the percentage of generic names found.
+<info added on 2025-08-04T11:07:46.959Z>
+The implementation now uses a comprehensive database of over 50 common AI-generated names, including generic function names ('process', 'handle') and single-letter variables ('i', 'j', 'k'). The AST parsing is more thorough, extracting class names and function arguments in addition to variables and functions, while also filtering out built-in names and keywords to focus on user-defined identifiers. The function's output is a structured dictionary containing the count of generic names, the total count of names, the calculated percentage, and a list of the specific generic names found. It gracefully handles syntax errors in the input code by returning a neutral result. The feature is validated by a suite of 8 comprehensive unit tests covering generic/descriptive names, mixed cases, and edge cases, all of which are passing.
+</info added on 2025-08-04T11:07:46.959Z>
+
+## 3. Implement Code Structure Analysis using AST [done]
+### Dependencies: None
+### Description: Use Python's Abstract Syntax Tree (AST) module to analyze the structural consistency of the code, looking for overly uniform or simplistic structures often produced by AI.
+### Details:
+In `engine.py`, create a function `analyze_code_structure(code_string)`. Use the `ast` module to parse the code. Traverse the tree to analyze metrics like function length, nesting depth, and the variety of node types used. The goal is to identify unnaturally consistent or simple structures.
+<info added on 2025-08-04T11:31:21.086Z>
+Implementation is complete and has been successfully tested. The `analyze_code_structure()` function was created in `shadow_ai/engine.py`. It uses AST parsing to analyze several key metrics: function length variance, average and maximum nesting depth, node type diversity, and control flow complexity. These are combined into a final 'structural uniformity score' from 0-100 to quantify suspicion.
+
+Helper functions `_calculate_max_nesting_depth()` and `_calculate_uniformity_score()` were also implemented. The feature is supported by 9 comprehensive test cases covering uniform/varied code, simple/complex patterns, and edge cases like syntax errors or empty input. All tests are passing. The function is robust, handles malformed code, and returns a detailed dictionary of metrics to be used by the confidence scoring module.
+</info added on 2025-08-04T11:31:21.086Z>
+
+## 4. Implement AI Language Pattern Matching in Comments [done]
+### Dependencies: None
+### Description: Develop a function to scan comments and docstrings for specific phrases and conversational artifacts commonly left by AI code generators.
+### Details:
+In `engine.py`, create a function `match_ai_language_patterns(code_string)`. Define a list of tell-tale AI phrases (e.g., 'As an AI language model', 'I cannot access real-time data', 'Here is an example'). Use case-insensitive regex to search for these patterns within comments and docstrings.
+<info added on 2025-08-04T11:45:30.350Z>
+Implementation is complete and has been comprehensively tested.
+
+**Key Features & Details:**
+- **Pattern Categories:** Expanded detection to cover 4 distinct categories: AI Self-References, Conversational Patterns, Disclaimer Patterns, and Example/Template Patterns.
+- **Confidence Scoring:** A helper function, `_calculate_ai_language_confidence()`, was created to calculate a confidence score (0-100) based on the density and variety of patterns found.
+- **Robust Extraction:** A helper function, `_extract_comments_and_docstrings()`, uses both line parsing and AST analysis for more accurate extraction.
+- **Testing:** A suite of 9 comprehensive test cases was created, covering all pattern types, human code, mixed content, and edge cases (e.g., empty input, no comments). All tests are passing.
+</info added on 2025-08-04T11:45:30.350Z>
+
+## 5. Integrate Heuristics in a Main Engine Orchestrator [done]
+### Dependencies: 2.1, 2.2, 2.3, 2.4
+### Description: Create a primary `analyze` function within the `engine.py` module that orchestrates the execution of all individual heuristic checks and aggregates their raw results into a single dictionary.
+### Details:
+In `engine.py`, define a main function `analyze(code_string)`. This function will call the four heuristic functions (`analyze_comment_patterns`, `analyze_variable_names`, etc.). It will aggregate the raw outputs into a structured dictionary, for example: `{'comment_patterns': {...}, 'variable_names': {...}}`. This dictionary will serve as the raw data for the confidence scoring logic (Task 8).
+<info added on 2025-08-04T12:03:41.596Z>
+The `analyze()` function has been implemented as the main entry point, orchestrating all four heuristic functions. The implementation includes robust error handling for each heuristic to prevent a single failure from stopping the entire analysis. The final output is a structured dictionary containing the results from each heuristic, plus additional `summary` (with high-level statistics and a preliminary risk score) and `analysis_metadata` (timestamp, code length, errors) sections. A comprehensive suite of 8 integration tests was created and is passing, covering various code types and edge cases.
+</info added on 2025-08-04T12:03:41.596Z>
+

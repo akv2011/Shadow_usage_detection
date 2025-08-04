@@ -1,0 +1,11 @@
+# Task ID: 10
+# Title: Implement Code Style Inconsistency Detector
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: Add an advanced detection feature to identify when coding style (e.g., indentation, spacing, naming conventions) changes within a single file, which can indicate AI-injected code.
+# Details:
+Extend the engine's AST analysis. For each function or class node, compute a style 'fingerprint' (e.g., a hash based on indentation type, variable name style, comment density). Compare these fingerprints across different nodes in the file. If a significant deviation is found, flag it as a 'Style Inconsistency' pattern.
+
+# Test Strategy:
+Create test files where one function is written in a different style (e.g., tabs vs. spaces, different variable casing). Run the detector and assert that it correctly flags the inconsistent function. Test with a consistently styled file to ensure no false positives.

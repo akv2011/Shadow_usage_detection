@@ -1,0 +1,11 @@
+# Task ID: 12
+# Title: Finalize Documentation and Test Suite
+# Status: pending
+# Dependencies: 5, 7, 8, 9, 10, 11
+# Priority: high
+# Description: Create comprehensive user documentation and a robust test suite to ensure the tool is reliable, easy to use, and maintainable.
+# Details:
+Write a detailed `README.md` file covering: project overview, installation instructions (for both CLI and web), usage examples for all CLI commands, and an explanation of the output format. Expand the test suite in `/tests` to have at least 80% code coverage, including integration tests for the CLI and API.
+
+# Test Strategy:
+Ask a new user to follow the `README.md` to install and run the tool. Their ability to do so without assistance is the primary test. Run a code coverage tool (e.g., `pytest-cov`) to verify test coverage meets the target. All tests must pass.

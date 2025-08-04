@@ -19,6 +19,10 @@ from shadow_ai.parser import (
     LanguageMapper, 
     read_source, 
     read_source_with_language,
+    parse_directory,
+    get_directory_stats,
+    parse,
+    parse_with_stats,
     validate_file_input,
     validate_string_input,
     ParserError,
@@ -449,6 +453,299 @@ class TestParserExceptions:
         """Test InvalidInputError message formatting."""
         error = InvalidInputError("Test invalid input")
         assert "Test invalid input" in str(error)
+
+
+class TestErrorScenarios:
+    """Test error handling and edge cases."""
+    
+    def test_read_source_nonexistent_file_as_string(self):
+        """Test that a non-existent file path is treated as raw string."""
+        fake_path = "/this/path/does/not/exist.py"
+        content, source_id = read_source(fake_path)
+        
+        assert content == fake_path
+        assert source_id == 'raw_string'
+    
+    def test_language_mapper_edge_cases(self):
+        """Test LanguageMapper with edge case inputs."""
+        # Empty string
+        assert LanguageMapper.get_language('') == 'plaintext'
+        
+        # Just extension (no basename) - this should be plaintext
+        assert LanguageMapper.get_language('.py') == 'plaintext'
+        
+        # Multiple dots
+        assert LanguageMapper.get_language('file.test.py') == 'Python'
+        
+        # Path objects
+        assert LanguageMapper.get_language(Path('test.js')) == 'JavaScript'
+
+
+class TestBatchProcessing:
+    """Test batch directory processing functionality."""
+    
+    def create_test_directory_with_files(self, num_code_files=5, num_non_code_files=2):
+        """Helper method to create a test directory with various files."""
+        temp_dir = Path(tempfile.mkdtemp())
+        
+        # Create code files
+        code_files = [
+            ('app.py', 'def main():\n    print("Hello from Python")'),
+            ('server.js', 'console.log("Hello from JavaScript");'),
+            ('main.go', 'package main\nfunc main() {\n    fmt.Println("Hello from Go")\n}'),
+            ('component.tsx', 'const Component = () => <div>Hello from TypeScript</div>;'),
+            ('style.css', 'body { color: blue; }'),
+            ('config.json', '{"name": "test", "version": "1.0.0"}'),
+            ('script.sh', '#!/bin/bash\necho "Hello from Shell"'),
+        ]
+        
+        # Create the requested number of code files
+        for i in range(min(num_code_files, len(code_files))):
+            filename, content = code_files[i]
+            (temp_dir / filename).write_text(content)
+        
+        # Create non-code files
+        non_code_files = [
+            ('README.md', '# Test Project\nThis is a test.'),
+            ('notes.txt', 'Some random notes here.'),
+            ('image.png', 'fake binary content'),
+        ]
+        
+        for i in range(min(num_non_code_files, len(non_code_files))):
+            filename, content = non_code_files[i]
+            (temp_dir / filename).write_text(content)
+        
+        return temp_dir
+    
+    def test_parse_directory_success(self):
+        """Test successful directory parsing with mixed file types."""
+        test_dir = self.create_test_directory_with_files(3, 2)
+        
+        try:
+            results = parse_directory(test_dir, max_files=5)
+            
+            # Should get all 3 code files (ignoring non-code files)
+            assert len(results) == 3
+            
+            # Check structure of results
+            for result in results:
+                assert 'content' in result
+                assert 'language' in result
+                assert 'source' in result
+                assert isinstance(result['content'], str)
+                assert isinstance(result['language'], str)
+                assert isinstance(result['source'], str)
+                assert len(result['content']) > 0
+            
+            # Check that files are processed in alphabetical order
+            sources = [result['source'] for result in results]
+            filenames = [Path(source).name for source in sources]
+            assert filenames == sorted(filenames)
+            
+        finally:
+            # Clean up
+            for file in test_dir.iterdir():
+                file.unlink()
+            test_dir.rmdir()
+    
+    def test_parse_directory_max_files_limit(self):
+        """Test that max_files limit is respected."""
+        test_dir = self.create_test_directory_with_files(7, 2)
+        
+        try:
+            # Request only 3 files from a directory with 7 code files
+            results = parse_directory(test_dir, max_files=3)
+            assert len(results) == 3
+            
+            # Request more files than available
+            results = parse_directory(test_dir, max_files=10)
+            assert len(results) == 7  # Only 7 code files exist
+            
+        finally:
+            # Clean up
+            for file in test_dir.iterdir():
+                file.unlink()
+            test_dir.rmdir()
+    
+    def test_parse_directory_empty_directory(self):
+        """Test parsing an empty directory."""
+        test_dir = Path(tempfile.mkdtemp())
+        
+        try:
+            results = parse_directory(test_dir)
+            assert results == []
+        finally:
+            test_dir.rmdir()
+    
+    def test_parse_directory_no_code_files(self):
+        """Test parsing a directory with no code files."""
+        test_dir = self.create_test_directory_with_files(0, 3)
+        
+        try:
+            results = parse_directory(test_dir)
+            assert results == []
+        finally:
+            # Clean up
+            for file in test_dir.iterdir():
+                file.unlink()
+            test_dir.rmdir()
+    
+    def test_parse_directory_validation_errors(self):
+        """Test directory parsing validation errors."""
+        # Test with non-existent directory
+        fake_dir = Path("/this/path/does/not/exist")
+        with pytest.raises(FileNotFoundError, match="Directory not found"):
+            parse_directory(fake_dir)
+        
+        # Test with invalid max_files
+        test_dir = Path(tempfile.mkdtemp())
+        try:
+            with pytest.raises(InvalidInputError, match="max_files must be positive"):
+                parse_directory(test_dir, max_files=0)
+            
+            with pytest.raises(InvalidInputError, match="max_files must be positive"):
+                parse_directory(test_dir, max_files=-1)
+        finally:
+            test_dir.rmdir()
+        
+        # Test with file path instead of directory
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.py') as f:
+            f.write(b"print('hello')")
+            temp_file = Path(f.name)
+        
+        try:
+            with pytest.raises(NotADirectoryError, match="not a directory"):
+                parse_directory(temp_file)
+        finally:
+            temp_file.unlink()
+    
+    def test_parse_directory_permission_denied(self):
+        """Test directory parsing with permission errors."""
+        test_dir = Path(tempfile.mkdtemp())
+        
+        try:
+            # Mock os.access to simulate permission denied
+            with patch('os.access', return_value=False):
+                with pytest.raises(PermissionError, match="permission denied"):
+                    parse_directory(test_dir)
+        finally:
+            test_dir.rmdir()
+    
+    def test_parse_directory_skip_problematic_files(self):
+        """Test that problematic files are skipped gracefully."""
+        test_dir = self.create_test_directory_with_files(2, 0)
+        
+        # Create a file that will cause an error (mock it to be too large)
+        large_file = test_dir / "large.py"
+        large_file.write_text("print('hello')")
+        
+        try:
+            # Mock file size validation to fail for large.py
+            original_validate = validate_file_input
+            def mock_validate(file_path):
+                if file_path.name == "large.py":
+                    raise FileTooLargeError("File too large")
+                return original_validate(file_path)
+            
+            with patch('shadow_ai.parser.validate_file_input', side_effect=mock_validate):
+                results = parse_directory(test_dir)
+                # Should get 2 files (skipping the problematic one)
+                assert len(results) == 2
+                
+                # Verify the problematic file is not in results
+                sources = [Path(result['source']).name for result in results]
+                assert "large.py" not in sources
+        
+        finally:
+            # Clean up
+            for file in test_dir.iterdir():
+                file.unlink()
+            test_dir.rmdir()
+
+
+class TestDirectoryStats:
+    """Test directory statistics functionality."""
+    
+    def test_get_directory_stats_mixed_files(self):
+        """Test directory statistics with mixed file types."""
+        temp_dir = Path(tempfile.mkdtemp())
+        
+        # Create various files
+        files_to_create = [
+            ('app.py', 'print("hello")'),
+            ('server.js', 'console.log("hello")'),
+            ('main.go', 'package main'),
+            ('README.md', '# Project'),
+            ('data.txt', 'some data'),
+            ('style.css', 'body {}'),
+        ]
+        
+        for filename, content in files_to_create:
+            (temp_dir / filename).write_text(content)
+        
+        try:
+            stats = get_directory_stats(temp_dir)
+            
+            assert stats['total_files'] == 6
+            assert stats['code_files'] == 4  # .py, .js, .go, .css
+            
+            expected_languages = {
+                'Python': 1,
+                'JavaScript': 1, 
+                'Go': 1,
+                'CSS': 1
+            }
+            assert stats['languages'] == expected_languages
+            
+        finally:
+            # Clean up
+            for file in temp_dir.iterdir():
+                file.unlink()
+            temp_dir.rmdir()
+    
+    def test_get_directory_stats_empty_directory(self):
+        """Test directory statistics for empty directory."""
+        temp_dir = Path(tempfile.mkdtemp())
+        
+        try:
+            stats = get_directory_stats(temp_dir)
+            
+            assert stats['total_files'] == 0
+            assert stats['code_files'] == 0
+            assert stats['languages'] == {}
+            
+        finally:
+            temp_dir.rmdir()
+    
+    def test_get_directory_stats_validation_errors(self):
+        """Test directory statistics validation errors."""
+        # Test with non-existent directory
+        fake_dir = Path("/this/path/does/not/exist")
+        with pytest.raises(FileNotFoundError, match="Directory not found"):
+            get_directory_stats(fake_dir)
+        
+        # Test with file path instead of directory
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.py') as f:
+            f.write(b"print('hello')")
+            temp_file = Path(f.name)
+        
+        try:
+            with pytest.raises(NotADirectoryError, match="not a directory"):
+                get_directory_stats(temp_file)
+        finally:
+            temp_file.unlink()
+    
+    def test_get_directory_stats_permission_denied(self):
+        """Test directory statistics with permission errors."""
+        temp_dir = Path(tempfile.mkdtemp())
+        
+        try:
+            # Mock os.access to simulate permission denied
+            with patch('os.access', return_value=False):
+                with pytest.raises(PermissionError, match="cannot be read"):
+                    get_directory_stats(temp_dir)
+        finally:
+            temp_dir.rmdir()
 
 
 class TestErrorScenarios:

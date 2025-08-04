@@ -1,0 +1,11 @@
+# Task ID: 11
+# Title: Set Up SQLite Database and History Dashboard
+# Status: pending
+# Dependencies: 6, 7
+# Priority: low
+# Description: Implement a simple persistence layer using SQLite to store analysis history. Create a basic dashboard page to display past results and simple statistics.
+# Details:
+Use Python's built-in `sqlite3` module. Create a database schema with a 'history' table (id, filename, timestamp, result, score). Modify the backend API to log every analysis to this table. Create a new `/dashboard` page and a corresponding API endpoint (`/api/history`) that retrieves all records. Display the history in a simple HTML table on the dashboard page.
+
+# Test Strategy:
+Perform several analyses via the web UI. Navigate to the dashboard page and verify that all analyses are listed correctly. Check the database file directly to ensure data is being written as expected. Restart the server and confirm the history persists.

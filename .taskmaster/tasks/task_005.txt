@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Integrate Engine with CLI and Format Output
+# Status: pending
+# Dependencies: 2, 3, 4
+# Priority: high
+# Description: Connect the detection engine to the CLI and format the analysis results into a user-friendly text output, including the final verdict, confidence score, and reasons.
+# Details:
+In the CLI module, after parsing and analysis, call a formatting function. This function will take the raw results from the engine (e.g., a dictionary of triggered heuristics) and generate the final output string: 'Result: Likely AI-Generated', 'Confidence: 75%', 'Reason: ...', 'Patterns Found: [Generic variable names, Repetitive comments]'.
+
+# Test Strategy:
+Run the CLI tool on test files. Verify that the output matches the expected format. Check that the confidence score and reasons are plausible based on the input code. This is an integration test.

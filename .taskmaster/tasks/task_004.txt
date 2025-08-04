@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Build CLI Interface
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Create a command-line interface (CLI) for the tool, allowing users to run analysis directly from their terminal. This provides a fast and scriptable way to use the detection engine.
+# Details:
+Use Python's `argparse` or a more modern library like `click`. Implement the specified commands: `shadow-detect analyze <file>`, `shadow-detect check --text "..."`, and `shadow-detect scan <directory> --recursive`. Structure the CLI to call the appropriate functions from the parser and engine modules.
+
+# Test Strategy:
+Run each command from the terminal with valid and invalid arguments. Verify that `analyze` works with a single file, `check` with a string, and `scan` with a directory. Check that help messages (`-h` or `--help`) are displayed correctly.
