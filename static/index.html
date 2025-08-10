@@ -41,35 +41,6 @@
             opacity: 0.9;
         }
 
-        .nav-links {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .nav-link {
-            display: inline-block;
-            color: white;
-            text-decoration: none;
-            padding: 12px 24px;
-            margin: 0 10px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 25px;
-            border: 2px solid rgba(255,255,255,0.3);
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .nav-link:hover {
-            background: rgba(255,255,255,0.3);
-            border-color: rgba(255,255,255,0.5);
-            transform: translateY(-2px);
-        }
-
-        .nav-link.active {
-            background: rgba(255,255,255,0.4);
-            border-color: rgba(255,255,255,0.6);
-        }
-
         .main-content {
             background: white;
             border-radius: 15px;
@@ -408,12 +379,6 @@
         <div class="header">
             <h1>🔍 Shadow AI Detection Tool</h1>
             <p>Detect AI-generated code patterns with advanced heuristic analysis</p>
-            
-            <div class="nav-links">
-                <a href="/" class="nav-link active">🔍 Analyzer</a>
-                <a href="/dashboard" class="nav-link">📊 Dashboard</a>
-                <a href="/quiz.html" class="nav-link">🧠 Quiz</a>
-            </div>
         </div>
 
         <div class="main-content">
@@ -522,7 +487,7 @@
 
     <script>
         let selectedFile = null;
-        const API_BASE = 'http://127.0.0.1:8000/api';
+        const API_BASE = 'http://127.0.0.1:8001/api';
 
         // Tab switching functionality
         function switchTab(tabName) {

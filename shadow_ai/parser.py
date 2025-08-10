@@ -1,5 +1,4 @@
 # Multi-language file parser for Shadow AI Detection
-# demo: minor inline comment added (worked on something)
 import os
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
@@ -31,8 +30,18 @@ MAX_STRING_LENGTH = 1000000  # 1 million characters for raw strings
 
 
 def validate_file_input(file_path: Path) -> None:
-    # demo-change: validation entrypoint comment (worked on something)
-
+    """
+    Validate file input for security and processing constraints.
+    
+    Args:
+        file_path: Path to the file to validate
+        
+    Raises:
+        FileNotFoundError: If the file doesn't exist
+        IsADirectoryError: If the path points to a directory
+        PermissionError: If the file cannot be read
+        FileTooLargeError: If the file exceeds size limits
+    """
     if not file_path.exists():
         raise FileNotFoundError(f"File not found: {file_path}")
     
@@ -56,8 +65,15 @@ def validate_file_input(file_path: Path) -> None:
 
 
 def validate_string_input(text: str) -> None:
-    # demo-change: string input guardrail note (worked on something)
-
+    """
+    Validate raw string input for processing constraints.
+    
+    Args:
+        text: Raw string to validate
+        
+    Raises:
+        InvalidInputError: If the string is invalid for processing
+    """
     if not isinstance(text, str):
         raise InvalidInputError(f"Input must be a string, got {type(text).__name__}")
     
@@ -75,8 +91,28 @@ def validate_string_input(text: str) -> None:
 
 
 def read_source(source: Union[str, Path]) -> Tuple[str, str]:
-    # demo-change: source reader quick note (worked on something)
-
+    """
+    Read content from a file path or treat as raw string input.
+    
+    This function is the foundation of the parser module, handling both file input
+    and direct string input with robust encoding detection for files.
+    
+    Args:
+        source: Either a file path (str/Path) or raw string content
+        
+    Returns:
+        Tuple containing:
+        - content (str): The text content
+        - source_identifier (str): File path or 'raw_string'
+        
+    Raises:
+        FileNotFoundError: If the file path doesn't exist
+        PermissionError: If the file cannot be read due to permissions
+        IsADirectoryError: If the path points to a directory
+        FileTooLargeError: If the file exceeds size limits
+        InvalidInputError: If the input is invalid
+        UnicodeDecodeError: If the file cannot be decoded with common encodings
+    """
     # Handle empty string case before Path creation
     if isinstance(source, str) and len(source) == 0:
         validate_string_input(source)  # This will raise InvalidInputError
@@ -198,7 +234,24 @@ class LanguageMapper:
 
 
 def read_source_with_language(source: Union[str, Path]) -> Tuple[str, str, str]:
-   
+    """
+    Read content from a source and identify the programming language.
+    
+    This enhanced version of read_source also determines the programming
+    language based on file extension, with full validation.
+    
+    Args:
+        source: Either a file path (str/Path) or raw string content
+        
+    Returns:
+        Tuple containing:
+        - content (str): The text content
+        - language (str): Programming language name or 'plaintext'
+        - source_identifier (str): File path or 'raw_string'
+        
+    Raises:
+        All exceptions from read_source, plus language mapping errors
+    """
     content, source_identifier = read_source(source)
     
     # Determine language
@@ -211,7 +264,29 @@ def read_source_with_language(source: Union[str, Path]) -> Tuple[str, str, str]:
 
 
 def parse_directory(dir_path: Union[str, Path], max_files: int = 5) -> List[Dict[str, str]]:
-   
+    """
+    Parse multiple files from a directory for batch analysis.
+    
+    Scans the given directory for source code files and processes up to max_files
+    of them. Files are selected based on recognized code file extensions and
+    processed in alphabetical order for consistency.
+    
+    Args:
+        dir_path: Path to the directory to scan
+        max_files: Maximum number of files to process (default: 5)
+        
+    Returns:
+        List of dictionaries, each containing:
+        - 'content': The file content as string
+        - 'language': Programming language name  
+        - 'source': File path
+        
+    Raises:
+        FileNotFoundError: If the directory doesn't exist
+        NotADirectoryError: If the path is not a directory
+        PermissionError: If the directory cannot be accessed
+        InvalidInputError: If max_files is invalid
+    """
     if max_files <= 0:
         raise InvalidInputError(f"max_files must be positive, got {max_files}")
     
@@ -263,7 +338,23 @@ def parse_directory(dir_path: Union[str, Path], max_files: int = 5) -> List[Dict
 
 
 def get_directory_stats(dir_path: Union[str, Path]) -> Dict[str, int]:
-   
+    """
+    Get statistics about code files in a directory.
+    
+    Args:
+        dir_path: Path to the directory to analyze
+        
+    Returns:
+        Dictionary with statistics:
+        - 'total_files': Total number of files
+        - 'code_files': Number of recognized code files
+        - 'languages': Dictionary mapping language names to file counts
+        
+    Raises:
+        FileNotFoundError: If the directory doesn't exist
+        NotADirectoryError: If the path is not a directory
+        PermissionError: If the directory cannot be accessed
+    """
     directory = Path(dir_path)
     
     # Validate directory
@@ -299,8 +390,40 @@ def get_directory_stats(dir_path: Union[str, Path]) -> Dict[str, int]:
 
 
 def parse(source: Union[str, Path], max_files: int = 5) -> List[Dict[str, str]]:
-    # demo-change: parse orchestrator note (worked on something)
+    """
+    Unified parser interface for all input types.
     
+    This is the main entry point for the parser module. It automatically detects
+    the input type (file, directory, or raw string) and processes it accordingly,
+    always returning a consistent list format for the detection engine.
+    
+    Args:
+        source: Input source - can be:
+            - File path (str/Path): Single file to process
+            - Directory path (str/Path): Directory to batch process  
+            - Raw string: Code content to analyze directly
+        max_files: Maximum files to process for directories (default: 5)
+        
+    Returns:
+        List of dictionaries, each containing:
+        - 'content': The code content as string
+        - 'language': Programming language name
+        - 'source': Source identifier (file path or 'raw_string')
+        - 'metadata': Additional metadata dictionary
+        
+    Raises:
+        All exceptions from underlying functions (validation, file access, etc.)
+        
+    Examples:
+        # Single file
+        results = parse('app.py')
+        
+        # Directory batch processing
+        results = parse('./src', max_files=10)
+        
+        # Raw code string
+        results = parse('def hello(): print("world")')
+    """
     # Handle empty string case before Path creation (empty string resolves to current directory)
     if isinstance(source, str) and len(source) == 0:
         # This will raise InvalidInputError for empty strings
@@ -370,8 +493,25 @@ def parse(source: Union[str, Path], max_files: int = 5) -> List[Dict[str, str]]:
 
 
 def parse_with_stats(source: Union[str, Path], max_files: int = 5) -> Dict[str, any]:
-    # demo-change: stats wrapper quick annotation (worked on something)
-
+    """
+    Parse with additional statistics and metadata.
+    
+    This enhanced version of parse() provides additional context about the
+    parsing operation, useful for debugging and user feedback.
+    
+    Args:
+        source: Input source (file, directory, or raw string)
+        max_files: Maximum files to process for directories
+        
+    Returns:
+        Dictionary containing:
+        - 'results': List of parsed results (same as parse())
+        - 'stats': Statistics about the parsing operation
+        - 'summary': Human-readable summary
+        
+    Raises:
+        All exceptions from parse()
+    """
     import time
     start_time = time.time()
     

@@ -9,22 +9,22 @@ class ConfidenceScorer:
 
     HEURISTIC_WEIGHTS = {
         'comment_patterns': {
-            'generic_comments': 12.0,  # Increased - generic comments are strong indicators
-            'comment_to_code_ratio': 8.0,  # Increased - high comment ratio is suspicious
-            'repetitive_patterns': 10.0,  # Increased - repetition is very AI-like
+            'generic_comments': 8.0,
+            'comment_to_code_ratio': 6.0,
+            'repetitive_patterns': 7.0,
         },
         'variable_names': {
-            'generic_percentage': 8.0,  # Increased - generic names are very common in AI code
+            'generic_percentage': 5.0,
         },
         'code_structure': {
-            'structural_uniformity': 6.0,  # Increased - AI code tends to be very uniform
-            'function_length_variance': 5.0,  # Increased - AI often creates similar-length functions
-            'nesting_depth_consistency': 4.0,
+            'structural_uniformity': 4.0,
+            'function_length_variance': 3.0,
+            'nesting_depth_consistency': 3.5,
         },
         'ai_language_patterns': {
-            'ai_phrases': 15.0,  # Significantly increased - direct AI references are smoking guns
-            'conversational_indicators': 12.0,  # Increased - conversational tone is very AI-like
-            'disclaimer_patterns': 10.0,  # Increased - disclaimers are strong indicators
+            'ai_phrases': 9.0,
+            'conversational_indicators': 8.5,
+            'disclaimer_patterns': 7.5,
         },
         'style_inconsistency': {
             'inconsistency_score': 6.5,
@@ -40,22 +40,22 @@ class ConfidenceScorer:
 
     MAX_SCORES = {
         'comment_patterns': {
-            'generic_comments': 10,  # Reduced - lower threshold for detection
-            'comment_to_code_ratio': 0.8,  # Reduced - more sensitive to high ratios
-            'repetitive_patterns': 5,  # Reduced - fewer patterns needed for detection
+            'generic_comments': 20,
+            'comment_to_code_ratio': 1.0,
+            'repetitive_patterns': 10,
         },
         'variable_names': {
-            'generic_percentage': 80,  # Reduced - 80% generic names should trigger high confidence
+            'generic_percentage': 100,
         },
         'code_structure': {
-            'structural_uniformity': 80,  # Reduced - more sensitive to uniformity
+            'structural_uniformity': 100,
             'function_length_variance': 0,
             'nesting_depth_consistency': 100,
         },
         'ai_language_patterns': {
-            'ai_phrases': 8,  # Reduced - fewer AI phrases needed for high confidence
-            'conversational_indicators': 5,  # Reduced - even a few conversational indicators are significant
-            'disclaimer_patterns': 3,  # Reduced - disclaimers are rare and highly indicative
+            'ai_phrases': 15,
+            'conversational_indicators': 10,
+            'disclaimer_patterns': 5,
         },
         'style_inconsistency': {
             'inconsistency_score': 100,

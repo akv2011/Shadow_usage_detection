@@ -230,7 +230,28 @@ def analyze_variable_names(code_string: str) -> Dict[str, Any]:
 
 
 def analyze_code_structure(code_string: str) -> Dict[str, Any]:
+    """
+    Analyze code structure using AST for patterns indicative of AI generation.
     
+    This function looks for:
+    - Overly uniform function lengths
+    - Consistent nesting depths
+    - Limited variety in AST node types
+    - Simplistic control flow patterns
+    - Repetitive structural patterns
+    
+    Args:
+        code_string (str): The source code to analyze
+        
+    Returns:
+        Dict[str, Any]: Dictionary containing analysis results:
+            - 'function_length_variance': Variance in function lengths (lower = more uniform)
+            - 'average_nesting_depth': Average nesting depth across functions
+            - 'node_type_diversity': Number of unique AST node types used
+            - 'control_flow_complexity': Complexity score based on control structures
+            - 'structural_uniformity_score': Overall uniformity score (0-100, higher = more uniform)
+            - 'total_functions': Total number of functions analyzed
+    """
     if not code_string or not isinstance(code_string, str):
         return {
             'function_length_variance': 0.0,

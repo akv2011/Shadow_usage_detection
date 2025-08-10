@@ -554,20 +554,6 @@ async def dashboard():
     return FileResponse('static/dashboard.html')
 
 
-@app.get("/quiz.html")
-async def quiz():
-
-    from fastapi.responses import FileResponse
-    return FileResponse('static/quiz.html')
-
-
-@app.get("/quiz")
-async def quiz_redirect():
-
-    from fastapi.responses import FileResponse
-    return FileResponse('static/quiz.html')
-
-
 @app.get("/api")
 async def api_info():
 
