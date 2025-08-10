@@ -44,22 +44,31 @@
 
         .nav-links {
             text-align: center;
-            margin-bottom: 20px;
+            margin: 20px 0;
         }
 
         .nav-link {
+            display: inline-block;
             color: white;
             text-decoration: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
+            margin: 0 10px;
             background: rgba(255,255,255,0.2);
             border-radius: 25px;
-            margin: 0 10px;
+            border: 2px solid rgba(255,255,255,0.3);
             transition: all 0.3s ease;
+            font-weight: 500;
         }
 
         .nav-link:hover {
             background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
             transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: rgba(255,255,255,0.4);
+            border-color: rgba(255,255,255,0.6);
         }
 
         .quiz-container {
@@ -368,18 +377,23 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧠 AI Pattern Quiz</h1>
-            <p>Test your ability to distinguish AI-generated code from human-written code</p>
+            <h1>🧠 AI Detection Training Quiz</h1>
+            <p>🎯 <strong>Purpose:</strong> Learn to distinguish AI-generated code from human-written code</p>
+            <p>🔍 <strong>Use Case:</strong> Train your eye to spot patterns that help identify automated code generation</p>
+            <p>📚 <strong>Why This Matters:</strong> Understanding AI code patterns helps in code reviews, security audits, and maintaining code quality</p>
+            
             <div class="nav-links">
-                <a href="/" class="nav-link">🔍 Code Analyzer</a>
-                <a href="/static/quiz.html" class="nav-link">🧠 Pattern Quiz</a>
+                <a href="/" class="nav-link">🔍 Analyzer</a>
+                <a href="/dashboard" class="nav-link">📊 Dashboard</a>
+                <a href="/quiz.html" class="nav-link active">🧠 Quiz</a>
             </div>
         </div>
 
         <div class="quiz-container">
             <div class="quiz-header">
-                <h2>Pattern Recognition Challenge</h2>
-                <p>Learn to identify common patterns in AI-generated code</p>
+                <h2>🎮 Interactive Learning Challenge</h2>
+                <p><strong>How it works:</strong> Analyze code snippets and guess if they're AI or human-written</p>
+                <p><strong>Learn:</strong> Get detailed explanations of AI patterns like verbose documentation, perfect formatting, and generic naming</p>
                 <div class="progress-bar">
                     <div class="progress-fill" id="progress-fill"></div>
                 </div>
@@ -454,7 +468,7 @@
         let currentQuestionIndex = 0;
         let userAnswers = {};
         let quizResults = {};
-        const API_BASE = 'http://127.0.0.1:8001/api';
+        const API_BASE = 'http://127.0.0.1:8000/api';
 
         // Initialize the quiz when page loads
         document.addEventListener('DOMContentLoaded', function() {

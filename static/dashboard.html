@@ -41,20 +41,33 @@
             opacity: 0.9;
         }
 
+        .nav-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+
         .nav-link {
             display: inline-block;
             color: white;
             text-decoration: none;
-            padding: 10px 20px;
-            margin: 10px 5px;
+            padding: 12px 24px;
+            margin: 0 10px;
             background: rgba(255,255,255,0.2);
             border-radius: 25px;
+            border: 2px solid rgba(255,255,255,0.3);
             transition: all 0.3s ease;
+            font-weight: 500;
         }
 
         .nav-link:hover {
             background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
             transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: rgba(255,255,255,0.4);
+            border-color: rgba(255,255,255,0.6);
         }
 
         .main-content {
@@ -236,11 +249,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Analysis Dashboard</h1>
+            <h1>📊 Analysis Dashboard</h1>
             <p>View analysis history and statistics</p>
-            <div>
-                <a href="/" class="nav-link">← Back to Analyzer</a>
-                <a href="/quiz.html" class="nav-link">Take Quiz</a>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-link">🔍 Analyzer</a>
+                <a href="/dashboard" class="nav-link active">📊 Dashboard</a>
+                <a href="/quiz.html" class="nav-link">🧠 Quiz</a>
             </div>
         </div>
 
